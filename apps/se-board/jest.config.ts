@@ -15,6 +15,10 @@ const config: Config = {
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/src/$1",
   },
+
+  transform: {
+    "^.+\\.svg$": "<rootDir>/svgTransformer.ts",
+  },
 };
 
 export default config;
