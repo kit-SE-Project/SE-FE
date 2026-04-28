@@ -22,9 +22,9 @@ export function errorHandle(error: ErrorCode | unknown) {
     window.history.back();
   } else if (errorCodeToAlertAndMain.includes(code)) {
     alert(message);
-    location.replace("/");
+    window.location.replace("/");
   } else if (code === 139) {
     alert("댓글 작성에 실패했습니다. 다시 시도해주세요.");
-    location.reload();
+    window.location.reload();
   }
 }
