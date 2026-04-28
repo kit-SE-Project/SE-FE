@@ -23,6 +23,11 @@ declare module "@types" {
   interface AuthorDTO {
     userId: string | null;
     name: string;
+    profileImageUrl: string | null;
+    frameGradientStart: string | null;
+    frameGradientEnd: string | null;
+    badgeType: "CHECK" | "KUMOH_CROW" | null;
+    badgeLabel: string | null;
   }
 
   interface PostListItem {
@@ -37,11 +42,17 @@ declare module "@types" {
     commentSize: number;
     pined: boolean;
     number: number; // 몇번째 게시글인지 보여주기 위한용도 다른 의미 없음
+    trending?: boolean;
   }
 
   interface Author {
     userId: string | null;
     name: string;
+    profileImageUrl: string | null;
+    frameGradientStart: string | null;
+    frameGradientEnd: string | null;
+    badgeType: "CHECK" | "KUMOH_CROW" | null;
+    badgeLabel: string | null;
   }
 
   interface PostDetatilCategory {
@@ -102,6 +113,9 @@ declare module "@types" {
     exposeType: string;
     attachments: { fileMetaDataList: Attachment[] };
     isPined: boolean;
+    likeCount: number;
+    dislikeCount: number;
+    myReaction: "LIKE" | "DISLIKE" | null;
   }
 
   interface exposeOptionDTO {

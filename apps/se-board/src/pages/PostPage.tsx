@@ -10,6 +10,7 @@ import {
   Content,
   DesktopHeader,
   Header,
+  PostLike,
 } from "@/components/detailPost";
 import { useGetPostQuery, useSecretPostMutation } from "@/react-query/hooks";
 import { useMobileHeaderState } from "@/store/mobileHeaderState";
@@ -99,6 +100,15 @@ export const PostPage = () => {
       <AttachmentFile files={attachemntFileData || []} />
 
       <Content contents={content || "<p></p>"} />
+
+      {postData && (
+        <PostLike
+          postId={postData.postId}
+          likeCount={postData.likeCount ?? 0}
+          dislikeCount={postData.dislikeCount ?? 0}
+          myReaction={postData.myReaction ?? null}
+        />
+      )}
 
       <CommentSection
         postId={postId}

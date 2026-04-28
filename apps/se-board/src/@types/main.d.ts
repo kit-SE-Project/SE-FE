@@ -19,7 +19,7 @@ declare module "@types" {
       first: boolean;
       empty: boolean;
     };
-
+    trendingPosts: PostListItemDTO[];
     menuName: string;
     urlId: string;
   }

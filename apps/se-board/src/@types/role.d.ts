@@ -4,6 +4,8 @@ declare module "@types" {
     name: string;
     description: string;
     alias: string;
+    badgeType?: "CHECK" | "KUMOH_CROW" | null;
+    badgePriority?: number | null;
   }
 
   interface AdminMenuRoll {

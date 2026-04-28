@@ -67,7 +67,15 @@ export const convertPostInfo = (post: PostDetail) => {
   return {
     postId,
     title,
-    author: { loginId: author.userId || "", name: author.name },
+    author: {
+      loginId: author.userId || "",
+      name: author.name,
+      profileImageUrl: author.profileImageUrl,
+      frameGradientStart: author.frameGradientStart,
+      frameGradientEnd: author.frameGradientEnd,
+      badgeType: author.badgeType,
+      badgeLabel: author.badgeLabel,
+    },
     views,
     category: category.name,
     createdAt,

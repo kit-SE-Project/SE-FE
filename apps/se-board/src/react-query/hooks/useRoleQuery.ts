@@ -30,18 +30,27 @@ export const useUpdateRole = () => {
       name: string;
       alias: string;
       description: string;
+      badgeType?: string | null;
+      badgePriority?: number | null;
     }) =>
       putRole(param.roleId, {
         name: param.name,
         alias: param.alias,
         description: param.description,
+        badgeType: param.badgeType,
+        badgePriority: param.badgePriority,
       })
   );
 };
 
 export const useAddRole = () => {
   return useMutation(
-    (param: { name: string; alias: string; description: string }) =>
-      postRole(param)
+    (param: {
+      name: string;
+      alias: string;
+      description: string;
+      badgeType?: string | null;
+      badgePriority?: number | null;
+    }) => postRole(param)
   );
 };

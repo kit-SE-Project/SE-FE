@@ -33,6 +33,7 @@ declare module "@types" {
     name: string;
     urlId: string;
     subMenu: [];
+    popularPostEnabled?: boolean;
   }
 
   interface MenuInfomation {
@@ -45,6 +46,7 @@ declare module "@types" {
     manage: MenuSettingRole;
     expose: MenuSettingRole;
     subMenus: MenuInfomation[];
+    popularPostEnabled?: boolean;
   }
 
   type MenuList = MenuInfomation[];
@@ -105,6 +107,7 @@ declare module "@types" {
       option: string;
       roles: number[];
     };
+    popularPostEnabled?: boolean;
   }
 
   interface MenuRoleInfo {
@@ -148,6 +151,7 @@ declare module "@types" {
       option: string;
       roles: number[];
     };
+    popularPostEnabled?: boolean;
   }
 
   interface AdminMenu {

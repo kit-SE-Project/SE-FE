@@ -15,6 +15,7 @@ import {
   Input,
   Select,
   SimpleGrid,
+  Switch,
   Text,
   useDisclosure,
   useToast,
@@ -351,6 +352,9 @@ const ModifyAlert = ({ isOpen, onClose, menuId, category }: AlertProps) => {
   const toast = useToast();
 
   const [categoryInfo, setCategoryInfo] = useState<MenuInfomation>(category);
+  const [popularPostEnabled, setPopularPostEnabled] = useState(
+    category.popularPostEnabled ?? false
+  );
   const [roles, setRoles] = useState<MenuRoleInfo>({
     access: {
       option: "",
@@ -374,6 +378,7 @@ const ModifyAlert = ({ isOpen, onClose, menuId, category }: AlertProps) => {
     if (!category) return;
 
     setCategoryInfo(category);
+    setPopularPostEnabled(category.popularPostEnabled ?? false);
   }, [category]);
 
   const cancelRef = useRef<HTMLButtonElement>(null);
@@ -391,6 +396,7 @@ const ModifyAlert = ({ isOpen, onClose, menuId, category }: AlertProps) => {
           write: roles.write,
           manage: roles.manage,
           expose: { option: "", roles: [] },
+          popularPostEnabled,
         },
       },
       {
@@ -489,6 +495,15 @@ const ModifyAlert = ({ isOpen, onClose, menuId, category }: AlertProps) => {
                 defaultRoles={category.write?.roles || []}
               />
             </FormControl>
+            <FormControl display="flex" alignItems="center" mt="0.75rem">
+              <FormLabel fontWeight="bold" w="8.75rem" wordBreak="keep-all">
+                인기글 섹션
+              </FormLabel>
+              <Switch
+                isChecked={popularPostEnabled}
+                onChange={(e) => setPopularPostEnabled(e.target.checked)}
+              />
+            </FormControl>
           </AlertDialogBody>
 
           <AlertDialogFooter>
@@ -530,6 +545,7 @@ const EnrollAlert = ({ isOpen, onClose, menuId }: EnrollAlertProps) => {
     writeRole: [],
     manageRole: [],
   });
+  const [popularPostEnabled, setPopularPostEnabled] = useState(false);
   const [roles, setRoles] = useState<MenuRoleInfo>({
     access: {
       option: "",
@@ -565,6 +581,7 @@ const EnrollAlert = ({ isOpen, onClose, menuId }: EnrollAlertProps) => {
           write: roles.write,
           manage: roles.manage,
           expose: { option: "", roles: [] },
+          popularPostEnabled,
         },
       },
       {
@@ -675,6 +692,15 @@ const EnrollAlert = ({ isOpen, onClose, menuId }: EnrollAlertProps) => {
                 카테고리 작성 권한
               </FormLabel>
               <AuthorityMenu roleType="write" setRoles={setRoles} />
+            </FormControl>
+            <FormControl display="flex" alignItems="center" mt="0.75rem">
+              <FormLabel fontWeight="bold" w="8.75rem" wordBreak="keep-all">
+                인기글 섹션
+              </FormLabel>
+              <Switch
+                isChecked={popularPostEnabled}
+                onChange={(e) => setPopularPostEnabled(e.target.checked)}
+              />
             </FormControl>
           </AlertDialogBody>
 

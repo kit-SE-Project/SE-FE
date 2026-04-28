@@ -6,8 +6,11 @@ import {
   bookmarkDelete,
   bookmarkPost,
   deletePost,
+  dislikePost,
   fetchGetPost,
+  fetchTrendingPosts,
   getDeletedPosts,
+  likePost,
   permanentlyDeletePosts,
   postPost,
   putPost,
@@ -59,6 +62,30 @@ export const usePutPostMutation = () => {
       },
     }
   );
+};
+
+export const useTrendingPostQuery = (
+  categoryId: number | undefined,
+  days?: number,
+  limit?: number
+) => {
+  return useQuery(
+    ["trendingPosts", categoryId, days, limit],
+    () => fetchTrendingPosts({ categoryId: categoryId!, days, limit }),
+    {
+      enabled: !!categoryId,
+      refetchOnWindowFocus: false,
+      staleTime: 1000 * 60 * 5,
+    }
+  );
+};
+
+export const useLikePostMutation = () => {
+  return useMutation((postId: number) => likePost(postId));
+};
+
+export const useDislikePostMutation = () => {
+  return useMutation((postId: number) => dislikePost(postId));
 };
 
 export const useBookmarkPostMutation = () => {

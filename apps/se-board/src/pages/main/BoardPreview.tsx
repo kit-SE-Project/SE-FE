@@ -1,4 +1,5 @@
 import {
+  Box,
   Divider,
   Flex,
   Heading,
@@ -17,16 +18,19 @@ interface BoardPreviewProps {
   menuName: string;
   menuUrlId: string;
   posts: PostListItemInfo[];
+  trendingPosts?: PostListItemInfo[];
 }
 
 export const BoardPreview = ({
   menuName,
   menuUrlId,
   posts,
+  trendingPosts = [],
 }: BoardPreviewProps) => {
   const navigate = useNavigate();
   const headingBgColor = useColorModeValue("gray.1", "whiteAlpha.200");
   const headingColor = useColorModeValue("blackAlpha.700", "whiteAlpha.700");
+  const trendingAccentColor = useColorModeValue("orange.400", "orange.300");
 
   return (
     <Stack w="full">
@@ -45,15 +49,25 @@ export const BoardPreview = ({
         <Heading fontSize={{ base: "1.5rem", md: "2rem" }} color={headingColor}>
           {menuName}
         </Heading>
-        {/* <Img
-          src={NoticeIcon}
-          position="absolute"
-          w={{ base: "5rem", md: "6rem" }}
-          right={{ base: "1rem", md: "2rem" }}
-          top="-1.5rem"
-        /> */}
       </Flex>
       <Flex direction="column" w="full">
+        {trendingPosts.length > 0 && (
+          <Box mb="0.5rem">
+            {trendingPosts.map((post, i) => (
+              <Fragment key={post.postId}>
+                <Box borderLeft="3px solid" borderColor={trendingAccentColor}>
+                  <PostListItem
+                    ellipsisLine={1}
+                    menuUrlId={menuUrlId}
+                    {...post}
+                  />
+                </Box>
+                {i < trendingPosts.length - 1 && <Divider />}
+              </Fragment>
+            ))}
+            <Divider />
+          </Box>
+        )}
         {posts.length === 0 ? (
           <EmptyPost />
         ) : (

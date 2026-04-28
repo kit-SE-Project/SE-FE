@@ -1,8 +1,5 @@
 import {
   Flex,
-  Menu,
-  MenuItem,
-  MenuList,
   Table as ChakraTable,
   Tbody,
   Td,
@@ -21,8 +18,10 @@ import {
 import { createColumnHelper } from "@tanstack/react-table";
 import { PostListItem } from "@types";
 import { BsLink45Deg, BsPinAngleFill } from "react-icons/bs";
+import { PiFireFill } from "react-icons/pi";
 import { Link } from "react-router-dom";
 
+import { RoleBadge } from "@/components/common/RoleBadge";
 import { toYYMMDD_DOT } from "@/utils/dateUtils";
 import { isRecentModifiedPost, isRecentPost } from "@/utils/postUtils";
 
@@ -37,6 +36,8 @@ const columns: ColumnDef<PostListItem, any>[] = [
     cell: (info) => {
       if (info.row.original.pined) {
         return <Icon as={BsPinAngleFill} color="primary" />;
+      } else if (info.row.original.trending) {
+        return <Icon as={PiFireFill} color="orange.400" />;
       } else {
         return info.getValue();
       }
@@ -49,6 +50,7 @@ const columns: ColumnDef<PostListItem, any>[] = [
         commentSize,
         hasAttachment,
         pined,
+        trending,
         postId,
         createdDateTime,
         modifiedDateTime,
@@ -63,7 +65,7 @@ const columns: ColumnDef<PostListItem, any>[] = [
                 textDecoration: "underline",
                 textDecorationColor: "gray.6",
               }}
-              fontWeight={pined ? "bold" : "normal"}
+              fontWeight={pined || trending ? "bold" : "normal"}
             >
               [{name}] {info.getValue()}
             </Text>
@@ -81,20 +83,17 @@ const columns: ColumnDef<PostListItem, any>[] = [
   }),
   columnHelper.accessor("author.name", {
     header: "작성자",
-    cell: (info) => (
-      <Flex justifyContent="flex-start">
-        <Menu autoSelect={false}>
-          {/* <MenuButton> */}
+    cell: (info) => {
+      const { badgeType, badgeLabel } = info.row.original.author;
+      return (
+        <Flex justifyContent="flex-start" alignItems="center" gap="4px">
           <Text whiteSpace="nowrap" textAlign="left">
             {info.getValue()}
           </Text>
-          {/* </MenuButton> */}
-          <MenuList>
-            <MenuItem>작성글 보기</MenuItem>
-          </MenuList>
-        </Menu>
-      </Flex>
-    ),
+          <RoleBadge badgeType={badgeType} badgeLabel={badgeLabel} />
+        </Flex>
+      );
+    },
   }),
   columnHelper.accessor("createdDateTime", {
     header: "작성일",
@@ -121,6 +120,14 @@ export const PostTable = ({ data }: PostTableProps) => {
   const titleColor = useColorModeValue("gray.7", "whiteAlpha.800");
   const borderColor = useColorModeValue("gray.3", "whiteAlpha.400");
   const pinnedBgColor = useColorModeValue("gray.1", "whiteAlpha.100");
+  const trendingBgColor = useColorModeValue("orange.50", "orange.900");
+  const trendingBorderColor = useColorModeValue("orange.200", "orange.700");
+
+  const rows = table.getRowModel().rows;
+  const lastTrendingIdx = rows.reduce(
+    (acc, row, idx) => (row.original.trending ? idx : acc),
+    -1
+  );
 
   return (
     <ChakraTable>
@@ -149,25 +156,38 @@ export const PostTable = ({ data }: PostTableProps) => {
         ))}
       </Thead>
       <Tbody>
-        {table.getRowModel().rows.map((row, i) => (
-          <Tr
-            key={i}
-            bgColor={row.original.pined ? pinnedBgColor : "transparent"}
-            fontSize="sm"
-            color={titleColor}
-          >
-            {row.getVisibleCells().map((cell, i) => (
-              <Td
-                key={cell.id}
-                w={columnWidth[i]}
-                textAlign={cell.column.id === "title" ? "left" : "center"}
-                borderColor={borderColor}
-              >
-                {flexRender(cell.column.columnDef.cell, cell.getContext())}
-              </Td>
-            ))}
-          </Tr>
-        ))}
+        {rows.map((row, i) => {
+          const isTrending = row.original.trending;
+          const isLastTrending = i === lastTrendingIdx;
+
+          return (
+            <Tr
+              key={i}
+              bgColor={
+                row.original.pined
+                  ? pinnedBgColor
+                  : isTrending
+                  ? trendingBgColor
+                  : "transparent"
+              }
+              fontSize="sm"
+              color={titleColor}
+              borderBottom={isLastTrending ? `2px solid` : undefined}
+              borderColor={isLastTrending ? trendingBorderColor : undefined}
+            >
+              {row.getVisibleCells().map((cell, i) => (
+                <Td
+                  key={cell.id}
+                  w={columnWidth[i]}
+                  textAlign={cell.column.id === "title" ? "left" : "center"}
+                  borderColor={borderColor}
+                >
+                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                </Td>
+              ))}
+            </Tr>
+          );
+        })}
       </Tbody>
     </ChakraTable>
   );

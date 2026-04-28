@@ -9,6 +9,9 @@ export const userState = atom<{
   userId: number;
   email: string;
   roles: string[];
+  profileImageUrl: string | null;
+  frameGradientStart: string | null;
+  frameGradientEnd: string | null;
 }>({
   key: "userState",
   default: {
@@ -16,6 +19,9 @@ export const userState = atom<{
     email: "",
     userId: -1,
     roles: [],
+    profileImageUrl: null,
+    frameGradientStart: null,
+    frameGradientEnd: null,
   },
 });
 

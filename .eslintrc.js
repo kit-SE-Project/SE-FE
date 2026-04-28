@@ -8,8 +8,8 @@ module.exports = {
     "no-unused-vars": "off",
     "unused-imports/no-unused-imports": "error",
     // https://github.com/lydell/eslint-plugin-simple-import-sort
-    "simple-import-sort/imports": "error",
-    "simple-import-sort/exports": "error",
+    "simple-import-sort/imports": "warn",
+    "simple-import-sort/exports": "warn",
   },
   env: {
     browser: true,

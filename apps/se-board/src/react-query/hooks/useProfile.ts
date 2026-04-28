@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { CommentListItemDTO, PostListItem } from "@types";
 import { useState } from "react";
 import { useSetRecoilState } from "recoil";
@@ -10,9 +10,14 @@ import {
   fetchPostListByLoginId,
 } from "@/api/post";
 import {
+  deleteProfileImage,
+  equipFrame,
+  fetchMyFrames,
   fetchUserProfile,
   fetchUserSimpleInfo,
+  unequipFrame,
   updateUserProfile,
+  uploadProfileImage,
 } from "@/api/profile";
 import { getStoredAccessToken } from "@/api/storage";
 import { roleNames, userState } from "@/store/user";
@@ -25,13 +30,14 @@ export const useFetchUserSimpleInfo = () => {
   return useQuery([queryKeys.profile], () => fetchUserSimpleInfo(), {
     enabled: !!getStoredAccessToken(),
     onSuccess: (res) => {
-      const { nickname, userId, email, roles } = res.data;
+      const { nickname, userId, email, roles, profileImageUrl } = res.data;
       setUserState((prev) => ({
         ...prev,
         nickname,
         userId,
         email,
         roles: roles.map((v) => roleNames[v as keyof typeof roleNames]),
+        profileImageUrl: profileImageUrl ?? null,
       }));
     },
   });
@@ -57,6 +63,76 @@ export const useUpdateUserProfile = () => {
           roles: roles.map((v) => roleNames[v as keyof typeof roleNames]),
         }));
       });
+    },
+  });
+};
+
+export const useUploadProfileImage = (userId: string) => {
+  const queryClient = useQueryClient();
+  const setUserState = useSetRecoilState(userState);
+  return useMutation((file: File) => uploadProfileImage(file), {
+    onSuccess: (res) => {
+      setUserState((prev) => ({ ...prev, profileImageUrl: res.data }));
+      queryClient.invalidateQueries([queryKeys.profile, userId]);
+    },
+  });
+};
+
+export const useDeleteProfileImage = (userId: string) => {
+  const queryClient = useQueryClient();
+  const setUserState = useSetRecoilState(userState);
+  return useMutation(() => deleteProfileImage(), {
+    onSuccess: () => {
+      setUserState((prev) => ({ ...prev, profileImageUrl: null }));
+      queryClient.invalidateQueries([queryKeys.profile, userId]);
+    },
+  });
+};
+
+export const useFetchMyFrames = () => {
+  return useQuery([queryKeys.profile, "frames"], () => fetchMyFrames(), {
+    enabled: !!getStoredAccessToken(),
+    select: (res) => res.data,
+  });
+};
+
+export const useEquipFrame = (userId: string) => {
+  const queryClient = useQueryClient();
+  const setUserState = useSetRecoilState(userState);
+  return useMutation(
+    ({
+      frameId,
+    }: {
+      frameId: number;
+      gradientStart: string;
+      gradientEnd: string;
+    }) => equipFrame(frameId),
+    {
+      onSuccess: (_res, variables) => {
+        setUserState((prev) => ({
+          ...prev,
+          frameGradientStart: variables.gradientStart,
+          frameGradientEnd: variables.gradientEnd,
+        }));
+        queryClient.invalidateQueries([queryKeys.profile, userId]);
+        queryClient.invalidateQueries([queryKeys.profile, "frames"]);
+      },
+    }
+  );
+};
+
+export const useUnequipFrame = (userId: string) => {
+  const queryClient = useQueryClient();
+  const setUserState = useSetRecoilState(userState);
+  return useMutation(() => unequipFrame(), {
+    onSuccess: () => {
+      setUserState((prev) => ({
+        ...prev,
+        frameGradientStart: null,
+        frameGradientEnd: null,
+      }));
+      queryClient.invalidateQueries([queryKeys.profile, userId]);
+      queryClient.invalidateQueries([queryKeys.profile, "frames"]);
     },
   });
 };

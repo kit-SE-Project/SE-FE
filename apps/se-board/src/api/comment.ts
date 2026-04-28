@@ -1,5 +1,6 @@
 import {
   AllComments,
+  BestComment,
   CommentsData,
   FetchCommentListResponse,
   PostCommentData,
@@ -98,6 +99,31 @@ export const deleteReply = async (replyId: number) => {
     url: `/reply/${replyId}`,
     method: HTTP_METHODS.DELETE,
   });
+};
+
+export const likeComment = async (commentId: number) => {
+  return _axios({
+    headers: { ...getJWTHeader() },
+    url: `/comments/${commentId}/like`,
+    method: HTTP_METHODS.POST,
+  });
+};
+
+export const dislikeComment = async (commentId: number) => {
+  return _axios({
+    headers: { ...getJWTHeader() },
+    url: `/comments/${commentId}/dislike`,
+    method: HTTP_METHODS.POST,
+  });
+};
+
+export const fetchBestComments = async (postId: string, limit: number = 3) => {
+  return _axios<BestComment[]>({
+    headers: { ...getJWTHeader() },
+    url: `/posts/${postId}/comments/best`,
+    method: HTTP_METHODS.GET,
+    params: { limit },
+  }).then((res) => res.data);
 };
 
 export const reportComment = (commentId: number) => {
