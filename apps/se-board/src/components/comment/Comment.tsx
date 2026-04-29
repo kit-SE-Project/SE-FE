@@ -19,6 +19,7 @@ export const Comment = ({ comment }: CommentProps) => {
 
   return (
     <Box
+      id={`comment-${comment.commentId}`}
       borderTop={`1px solid`}
       borderColor={borderColor}
       py={{ base: "0.0125rem", md: "0" }}
@@ -28,6 +29,7 @@ export const Comment = ({ comment }: CommentProps) => {
       {comment.subComments.map((subComment) => (
         <Box
           key={subComment.commentId}
+          id={`comment-${subComment.commentId}`}
           w="100%"
           pl={{
             base: "36px",

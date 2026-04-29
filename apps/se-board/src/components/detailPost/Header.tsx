@@ -13,8 +13,10 @@ import {
   useColorModeValue,
 } from "@chakra-ui/react";
 import { DateType } from "@types";
-import { BsClock, BsFillEyeFill, BsPerson } from "react-icons/bs";
+import { BsClock, BsFillEyeFill } from "react-icons/bs";
 
+import { GradientAvatar } from "@/components/common/GradientAvatar";
+import { RoleBadge } from "@/components/common/RoleBadge";
 import { useBookmarked, useNavigatePage } from "@/hooks";
 import { isModifiedContent, toYYYYMMDDHHhhss } from "@/utils/dateUtils";
 
@@ -29,6 +31,11 @@ interface HeaderProps {
     author: {
       loginId: string;
       name: string;
+      profileImageUrl?: string | null;
+      frameGradientStart?: string | null;
+      frameGradientEnd?: string | null;
+      badgeType?: "CHECK" | "KUMOH_CROW" | null;
+      badgeLabel?: string | null;
     };
     views: number;
     category: string;
@@ -39,25 +46,47 @@ interface HeaderProps {
   };
 }
 
-const AuthorInfoMenuList = ({ id, name }: { id: string; name: string }) => {
+const AuthorInfoMenuList = ({
+  id,
+  name,
+  profileImageUrl,
+  frameGradientStart,
+  frameGradientEnd,
+  badgeType,
+  badgeLabel,
+}: {
+  id: string;
+  name: string;
+  profileImageUrl?: string | null;
+  frameGradientStart?: string | null;
+  frameGradientEnd?: string | null;
+  badgeType?: "CHECK" | "KUMOH_CROW" | null;
+  badgeLabel?: string | null;
+}) => {
   const { goToProfilePage } = useNavigatePage();
 
   return (
     <Menu autoSelect={false}>
       <MenuButton cursor={id ? "pointer" : "not-allowed"}>
-        <Box display="flex" alignItems="center">
-          <Icon
-            as={BsPerson}
-            boxSize={{ base: "20px", md: "24px" }}
-            my="auto"
+        <Box display="flex" alignItems="center" gap="4px">
+          <GradientAvatar
+            src={profileImageUrl ?? undefined}
+            size="xs"
+            name={profileImageUrl ? undefined : name}
+            gradientStart={frameGradientStart}
+            gradientEnd={frameGradientEnd}
+            borderWidth={2}
+            gapWidth={1}
+            glow={false}
           />
           <Text
-            ml="6px"
+            ml="2px"
             fontSize={{ base: "md", md: "lg" }}
             whiteSpace="nowrap"
           >
             {name}
           </Text>
+          <RoleBadge badgeType={badgeType} badgeLabel={badgeLabel} />
         </Box>
       </MenuButton>
       {!!id && (
@@ -112,6 +141,11 @@ export const Header = ({ HeadingInfo }: HeaderProps) => {
             <AuthorInfoMenuList
               id={HeadingInfo.author.loginId}
               name={HeadingInfo.author.name}
+              profileImageUrl={HeadingInfo.author.profileImageUrl}
+              frameGradientStart={HeadingInfo.author.frameGradientStart}
+              frameGradientEnd={HeadingInfo.author.frameGradientEnd}
+              badgeType={HeadingInfo.author.badgeType}
+              badgeLabel={HeadingInfo.author.badgeLabel}
             />
 
             <Box display="flex" alignItems="baseline">
@@ -170,6 +204,11 @@ export const DesktopHeader = ({ HeadingInfo }: HeaderProps) => {
           <AuthorInfoMenuList
             id={HeadingInfo.author.loginId}
             name={HeadingInfo.author.name}
+            profileImageUrl={HeadingInfo.author.profileImageUrl}
+            frameGradientStart={HeadingInfo.author.frameGradientStart}
+            frameGradientEnd={HeadingInfo.author.frameGradientEnd}
+            badgeType={HeadingInfo.author.badgeType}
+            badgeLabel={HeadingInfo.author.badgeLabel}
           />
           <Box display="flex" alignItems="baseline">
             <Icon as={BsClock} boxSize="20px" my="auto" />

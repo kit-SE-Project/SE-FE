@@ -115,6 +115,45 @@ export const putPost = async (postId: number, data: PostPut) => {
   }).then((res) => res.data);
 };
 
+export const fetchTrendingPosts = async ({
+  categoryId,
+  days = 7,
+  limit = 5,
+}: {
+  categoryId: number;
+  days?: number;
+  limit?: number;
+}) => {
+  return _axios<PostListItemDTO[]>({
+    headers: {
+      ...getJWTHeader(),
+    },
+    url: `/posts/trending`,
+    method: HTTP_METHODS.GET,
+    params: { categoryId, days, limit },
+  }).then((res) => res.data);
+};
+
+export const likePost = async (postId: number) => {
+  return _axios({
+    headers: {
+      ...getJWTHeader(),
+    },
+    url: `/posts/${postId}/like`,
+    method: HTTP_METHODS.POST,
+  });
+};
+
+export const dislikePost = async (postId: number) => {
+  return _axios({
+    headers: {
+      ...getJWTHeader(),
+    },
+    url: `/posts/${postId}/dislike`,
+    method: HTTP_METHODS.POST,
+  });
+};
+
 export const bookmarkPost = async (postId: number) => {
   return _axios({
     headers: {

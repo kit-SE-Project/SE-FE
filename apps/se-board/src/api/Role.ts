@@ -25,7 +25,13 @@ export const deleteRole = (roleId: number) => {
 
 export const putRole = (
   roleId: number,
-  data: { name: string; alias: string; description: string }
+  data: {
+    name: string;
+    alias: string;
+    description: string;
+    badgeType?: string | null;
+    badgePriority?: number | null;
+  }
 ) => {
   return _axios({
     headers: {
@@ -41,6 +47,8 @@ export const postRole = (data: {
   name: string;
   alias: string;
   description: string;
+  badgeType?: string | null;
+  badgePriority?: number | null;
 }) => {
   return _axios({
     headers: {

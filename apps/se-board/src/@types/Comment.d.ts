@@ -1,5 +1,7 @@
 import { AuthorDTO, DateType, Pageable, PageableInfo } from "@types";
 import { CommentPaginationInfo } from "@types";
+import { Attachment } from "@types";
+
 declare module "@types" {
   interface Comment extends CommentContent {
     subComments: SubCommentContent[];
@@ -8,8 +10,13 @@ declare module "@types" {
   interface CommentContent {
     commentId: number;
     author: {
-      userId: string;
+      userId: string | null;
       name: string;
+      profileImageUrl: string | null;
+      frameGradientStart: string | null;
+      frameGradientEnd: string | null;
+      badgeType: "CHECK" | "KUMOH_CROW" | null;
+      badgeLabel: string | null;
     };
     createdAt: string;
     modifiedAt: string;
@@ -17,6 +24,24 @@ declare module "@types" {
     isEditable: boolean;
     isActive: boolean;
     isReadOnlyAuthor: boolean;
+    likeCount: number;
+    dislikeCount: number;
+    myReaction: "LIKE" | "DISLIKE" | null;
+    attachments: Attachment[];
+  }
+
+  interface BestComment {
+    commentId: number;
+    author: {
+      userId: string;
+      name: string;
+    };
+    contents: string;
+    createdAt: string;
+    likeCount: number;
+    myReaction: "LIKE" | "DISLIKE" | null;
+    isReply: boolean;
+    pageNumber: number;
   }
 
   interface SubCommentContent extends CommentContent {
@@ -39,11 +64,13 @@ declare module "@types" {
     contents: string;
     isAnonymous: boolean;
     isReadOnlyAuthor: boolean;
+    attachmentIds?: number[];
   }
 
   interface PutCommentData {
     contents: string;
     isReadOnlyAuthor: boolean;
+    attachmentIds?: number[];
   }
 
   interface PostReplyData {
@@ -53,6 +80,7 @@ declare module "@types" {
     contents: string;
     isAnonymous: boolean;
     isReadOnlyAuthor: boolean;
+    attachmentIds?: number[];
   }
 
   interface FetchCommentListResponse {

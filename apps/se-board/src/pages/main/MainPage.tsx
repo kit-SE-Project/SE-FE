@@ -61,6 +61,9 @@ export const MainPage = () => {
                 posts={menu.posts.content
                   .map((v) => convertPostListItemDTOToPostListItem(v))
                   .map((v) => ({ ...v, pined: false }))}
+                trendingPosts={(menu.trendingPosts ?? [])
+                  .map((v) => convertPostListItemDTOToPostListItem(v))
+                  .map((v) => ({ ...v, trending: true }))}
               />
             </GridItem>
           ))}

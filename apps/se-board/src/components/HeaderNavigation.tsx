@@ -4,7 +4,6 @@ import {
   AccordionIcon,
   AccordionItem,
   AccordionPanel,
-  Avatar,
   Box,
   Button,
   ButtonGroup,
@@ -32,6 +31,7 @@ import { BsBoxArrowUpRight, BsList } from "react-icons/bs";
 import { NavLink } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 
+import { GradientAvatar } from "@/components/common/GradientAvatar";
 import { useNavigatePage, useWindowSize } from "@/hooks";
 import { useLogout } from "@/react-query/hooks/auth";
 import { mobileHeaderState } from "@/store/mobileHeaderState";
@@ -135,7 +135,26 @@ export const DesktopHeaderNavigation = ({
         >
           {hasAuth ? (
             <>
-              <Button onClick={goToMyPage} variant="link" color={color}>
+              <Button
+                onClick={goToMyPage}
+                variant="link"
+                color={color}
+                display="flex"
+                alignItems="center"
+                gap="0.5rem"
+              >
+                <GradientAvatar
+                  src={userInfo.profileImageUrl ?? undefined}
+                  size="xs"
+                  name={
+                    userInfo.profileImageUrl ? undefined : userInfo.nickname
+                  }
+                  gradientStart={userInfo.frameGradientStart}
+                  gradientEnd={userInfo.frameGradientEnd}
+                  borderWidth={2}
+                  gapWidth={1}
+                  glow={false}
+                />
                 {userInfo.nickname}
               </Button>
               <Button
@@ -209,7 +228,14 @@ const DrawerNavigation = ({
                 cursor: "pointer",
               }}
             >
-              <Avatar />
+              <GradientAvatar
+                src={userInfo.profileImageUrl ?? undefined}
+                name={userInfo.profileImageUrl ? undefined : userInfo.nickname}
+                gradientStart={userInfo.frameGradientStart}
+                gradientEnd={userInfo.frameGradientEnd}
+                borderWidth={3}
+                gapWidth={2}
+              />
               <Text color={color}>{userInfo.nickname}</Text>
             </Flex>
           ) : (

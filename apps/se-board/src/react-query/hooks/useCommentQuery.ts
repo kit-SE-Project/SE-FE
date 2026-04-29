@@ -5,9 +5,12 @@ import {
   deleteComment,
   deleteCommentList,
   deleteReply,
+  dislikeComment,
+  fetchBestComments,
   fetchComments,
   getAdminComments,
   getDeletedComments,
+  likeComment,
   permanentlyDeleteComments,
   postComment,
   postReply,
@@ -98,6 +101,26 @@ export const usePutReplyMutation = (postId?: string) => {
 
 export const useDeleteReplyMutation = (postId?: string) => {
   return useMutation((replyId: number) => deleteReply(replyId));
+};
+
+export const useLikeCommentMutation = () => {
+  return useMutation((commentId: number) => likeComment(commentId));
+};
+
+export const useDislikeCommentMutation = () => {
+  return useMutation((commentId: number) => dislikeComment(commentId));
+};
+
+export const useBestCommentsQuery = (postId?: string, limit: number = 3) => {
+  return useQuery(
+    ["bestComments", postId],
+    () => fetchBestComments(postId!, limit),
+    {
+      enabled: !!postId,
+      refetchOnWindowFocus: false,
+      staleTime: 1000 * 60 * 5,
+    }
+  );
 };
 
 export const useGetAdminCommmentQuery = (

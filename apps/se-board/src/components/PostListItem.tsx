@@ -8,9 +8,11 @@ import {
   useColorModeValue,
 } from "@chakra-ui/react";
 import { PostListItem as PostListItemInfo } from "@types";
-import { BsLink45Deg, BsPinAngleFill } from "react-icons/bs";
+import { BsLink45Deg } from "react-icons/bs";
+import { PiFireFill } from "react-icons/pi";
 import { Link } from "react-router-dom";
 
+import { RoleBadge } from "@/components/common/RoleBadge";
 import { NewIcon } from "@/components/NewIcon";
 import { toYYMMDD_DOT } from "@/utils/dateUtils";
 import {
@@ -37,6 +39,7 @@ export const PostListItem = ({
   hasAttachment,
   commentSize,
   pined,
+  trending,
   ellipsisLine = 0,
   menuUrlId,
 }: PostListItemProps) => {
@@ -55,7 +58,6 @@ export const PostListItem = ({
       py="0.5rem"
       _hover={{ bgColor: hoverColor, cursor: "pointer" }}
     >
-      {pined && <Icon as={BsPinAngleFill} mr="0.5rem" color="primary" />}
       <Flex direction="column" gap="0.5rem" mr="2rem">
         <Heading
           as="h3"
@@ -63,7 +65,7 @@ export const PostListItem = ({
           noOfLines={ellipsisLine}
           fontWeight={pined ? "black" : "bold"}
           fontSize="sm"
-          color={pined ? "primary" : titleColor}
+          color={titleColor}
         >
           [{category.name}] {title}
         </Heading>
@@ -76,6 +78,10 @@ export const PostListItem = ({
         >
           <Flex alignItems="center" columnGap="0.375rem">
             <Text>{author.name}</Text>
+            <RoleBadge
+              badgeType={author.badgeType}
+              badgeLabel={author.badgeLabel}
+            />
             <Flex>
               <Text>{toYYMMDD_DOT(createdDateTime)}</Text>
               {/* {isModified(createdDateTime, modifiedDateTime) && (
@@ -95,6 +101,7 @@ export const PostListItem = ({
             ) : isRecentModifiedPost(createdDateTime, modifiedDateTime) ? (
               <UpdateIcon />
             ) : null}
+            {trending && <Icon as={PiFireFill} color="orange.400" />}
           </Flex>
         </Flex>
       </Flex>
