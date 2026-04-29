@@ -8,17 +8,17 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   build-and-push:
     name: Build Docker Image & Push to GHCR
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     permissions:
       contents: read
       packages: write
     outputs:
       image-tag: ${{ steps.vars.outputs.sha }}
+      image-name: ${{ steps.vars.outputs.image_name }}
 
     steps:
       - uses: actions/checkout@v4
@@ -44,29 +44,24 @@ jobs:
           tags: |
             ${{ env.REGISTRY }}/${{ steps.vars.outputs.image_name }}:${{ steps.vars.outputs.sha }}
             ${{ env.REGISTRY }}/${{ steps.vars.outputs.image_name }}:latest
-          # CRA 환경변수는 빌드 타임에 주입
           build-args: |
             REACT_APP_API_ENDPOINT=${{ secrets.REACT_APP_API_ENDPOINT }}
             REACT_APP_FILE_ENDPOINT=${{ secrets.REACT_APP_FILE_ENDPOINT }}
             REACT_APP_API_FILE_ENDPOINT=${{ secrets.REACT_APP_API_FILE_ENDPOINT }}
             REACT_APP_ENDPOINT=${{ secrets.REACT_APP_ENDPOINT }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
 
   deploy:
     name: Deploy to K3s
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     needs: build-and-push
     environment: production
 
     steps:
-      - uses: appleboy/ssh-action@v1
-        with:
-          host: ${{ secrets.K3S_HOST }}
-          username: ${{ secrets.K3S_USER }}
-          key: ${{ secrets.K3S_SSH_KEY }}
-          script: |
-            kubectl set image deployment/seboard-frontend \
-              seboard-frontend=ghcr.io/${{ github.repository }}:${{ needs.build-and-push.outputs.image-tag }} \
-              -n seboard
-            kubectl rollout status deployment/seboard-frontend -n seboard --timeout=180s
+      - name: Deploy
+        env:
+          KUBECONFIG: /etc/rancher/k3s/k3s.yaml
+        run: |
+          kubectl set image deployment/seboard-frontend \
+            seboard-frontend=${{ env.REGISTRY }}/${{ needs.build-and-push.outputs.image-name }}:${{ needs.build-and-push.outputs.image-tag }} \
+            -n seboard
+          kubectl rollout status deployment/seboard-frontend -n seboard --timeout=180s
