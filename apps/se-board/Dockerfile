@@ -6,6 +6,7 @@ COPY package.json package-lock.json ./
 COPY libs libs
 
 # ckeditor5-custom-build가 로컬 파일 의존성이므로 libs 먼저 복사 후 설치
+#test
 RUN npm install --legacy-peer-deps && npm install --legacy-peer-deps @ckeditor/ckeditor5-watchdog
 
 COPY public public
