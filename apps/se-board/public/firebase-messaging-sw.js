@@ -19,8 +19,9 @@ const messaging = firebase.messaging();
 
 // 백그라운드 메시지 수신
 messaging.onBackgroundMessage((payload) => {
-  const title = payload.notification?.title ?? "새 알림";
-  const body = payload.notification?.body ?? "";
+  // data-only 메시지이므로 payload.data에서 꺼냄
+  const title = payload.data?.title ?? "새 알림";
+  const body = payload.data?.body ?? "";
   const url = payload.data?.url ?? "/";
 
   return self.registration.showNotification(title, {

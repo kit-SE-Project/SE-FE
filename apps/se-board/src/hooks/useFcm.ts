@@ -8,6 +8,9 @@ import { messaging } from "@/firebase";
 const VAPID_KEY =
   "BFFYEnN0U5wVDKbnY_7by3laYurljwZe21yRsJ8vaM9IGW8yHYM_W3QYvQyrgr86MM5WBz46INGL8kZJbq7Pm4c";
 
+const isFcmSupported = () =>
+  "Notification" in window && "serviceWorker" in navigator;
+
 export const useFcm = (isLoggedIn: boolean) => {
   useEffect(() => {
     if (!isLoggedIn || !VAPID_KEY) return;
@@ -18,14 +21,20 @@ export const useFcm = (isLoggedIn: boolean) => {
       return;
     }
 
-    // 포그라운드 FCM 수신 - SSE가 이미 처리하므로 OS 알림 표시 안 함
-    const unsubscribe = onMessage(messaging, (_payload) => {});
+    // iOS Safari 등 FCM 미지원 환경 체크
+    if (!isFcmSupported() || !messaging) return;
+
+    let unsubscribe: (() => void) | undefined;
+    try {
+      unsubscribe = onMessage(messaging, (_payload) => {});
+    } catch {
+      return;
+    }
 
     Notification.requestPermission().then((permission) => {
       if (permission !== "granted") return;
 
-      // 앱 로드마다 getToken 호출 → 토큰 갱신 자동 처리
-      getToken(messaging, { vapidKey: VAPID_KEY })
+      getToken(messaging!, { vapidKey: VAPID_KEY })
         .then((token) => {
           if (token) {
             console.log("[FCM] 토큰:", token);
@@ -37,7 +46,7 @@ export const useFcm = (isLoggedIn: boolean) => {
         .catch((e) => console.error("[FCM] 에러:", e));
     });
 
-    return () => unsubscribe();
+    return () => unsubscribe?.();
   }, [isLoggedIn]);
 };
 
