@@ -27,6 +27,7 @@ import {
   requestKumohmailAuthCode,
   signup,
 } from "@/api/auth";
+import { deleteFcmToken } from "@/api/fcm";
 import { fetchUserSimpleInfo } from "@/api/profile";
 import {
   getStoredRefreshToken,
@@ -160,6 +161,9 @@ export const useLogout = () => {
   const refreshToken = getStoredRefreshToken();
   return useMutation(["logout"], () => logout(refreshToken!), {
     onSuccess: (res) => {
+      // 로그인 유지였던 경우 FCM 토큰 삭제
+      if (isMaintainLogin()) deleteFcmToken().catch(() => {});
+
       localStorage.removeItem("access_token");
       sessionStorage.removeItem("access_token");
       localStorage.removeItem("refresh_token");

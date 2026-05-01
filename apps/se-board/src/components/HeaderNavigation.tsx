@@ -6,7 +6,6 @@ import {
   AccordionPanel,
   Box,
   Button,
-  ButtonGroup,
   Center,
   Drawer,
   DrawerBody,
@@ -32,6 +31,7 @@ import { NavLink } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 
 import { GradientAvatar } from "@/components/common/GradientAvatar";
+import { NotificationBell } from "@/components/notification/NotificationBell";
 import { useNavigatePage, useWindowSize } from "@/hooks";
 import { useLogout } from "@/react-query/hooks/auth";
 import { mobileHeaderState } from "@/store/mobileHeaderState";
@@ -128,66 +128,69 @@ export const DesktopHeaderNavigation = ({
             ))}
           </Box>
         </Box>
-        <ButtonGroup
-          visibility={viewMode === "desktop" ? "visible" : "hidden"}
-          w={992 <= windowSize.width ? "auto" : "0px"}
-          h={992 <= windowSize.width ? "auto" : "0px"}
-        >
-          {hasAuth ? (
-            <>
+
+        {/* 오른쪽 컨트롤 영역 - 벨은 항상, 나머지는 viewMode에 따라 */}
+        <Flex align="center" gap="0.5rem" flexShrink={0}>
+          {hasAuth && <NotificationBell isLoggedIn={hasAuth} />}
+
+          {/* 데스크탑: 아바타 + 로그아웃 / 로그인 */}
+          {viewMode === "desktop" &&
+            (hasAuth ? (
+              <>
+                <Button
+                  onClick={goToMyPage}
+                  variant="link"
+                  color={color}
+                  display="flex"
+                  alignItems="center"
+                  gap="0.5rem"
+                >
+                  <GradientAvatar
+                    src={userInfo.profileImageUrl ?? undefined}
+                    size="xs"
+                    name={
+                      userInfo.profileImageUrl ? undefined : userInfo.nickname
+                    }
+                    gradientStart={userInfo.frameGradientStart}
+                    gradientEnd={userInfo.frameGradientEnd}
+                    borderWidth={2}
+                    gapWidth={1}
+                    glow={false}
+                  />
+                  {userInfo.nickname}
+                </Button>
+                <Button
+                  onClick={() => logout()}
+                  variant="primary-outline"
+                  rounded="full"
+                >
+                  로그아웃
+                </Button>
+              </>
+            ) : (
               <Button
-                onClick={goToMyPage}
-                variant="link"
-                color={color}
-                display="flex"
-                alignItems="center"
-                gap="0.5rem"
-              >
-                <GradientAvatar
-                  src={userInfo.profileImageUrl ?? undefined}
-                  size="xs"
-                  name={
-                    userInfo.profileImageUrl ? undefined : userInfo.nickname
-                  }
-                  gradientStart={userInfo.frameGradientStart}
-                  gradientEnd={userInfo.frameGradientEnd}
-                  borderWidth={2}
-                  gapWidth={1}
-                  glow={false}
-                />
-                {userInfo.nickname}
-              </Button>
-              <Button
-                onClick={() => logout()}
+                onClick={goToLoginPage}
                 variant="primary-outline"
                 rounded="full"
               >
-                로그아웃
+                로그인
               </Button>
+            ))}
+
+          {/* 태블릿/모바일: 햄버거 */}
+          {viewMode === "tablet" && (
+            <>
+              <Button onClick={onOpen} variant="ghost" p="0">
+                <Icon as={BsList} color={color} boxSize="2rem" />
+              </Button>
+              <DrawerNavigation
+                isOpen={isOpen}
+                onClose={onClose}
+                menuList={menuList}
+              />
             </>
-          ) : (
-            <Button
-              onClick={goToLoginPage}
-              variant="primary-outline"
-              rounded="full"
-            >
-              로그인
-            </Button>
           )}
-        </ButtonGroup>
-        {/* tablet 사이즈에서 노출 desktop 사이즈에서 노출X */}
-        {viewMode == "tablet" && (
-          <>
-            <Button onClick={onOpen} variant="ghost" p="0">
-              <Icon as={BsList} color={color} boxSize="2rem" />
-            </Button>
-            <DrawerNavigation
-              isOpen={isOpen}
-              onClose={onClose}
-              menuList={menuList}
-            />
-          </>
-        )}
+        </Flex>
       </Flex>
     </Center>
   );
