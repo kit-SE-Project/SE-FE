@@ -49,6 +49,7 @@ jobs:
             REACT_APP_FILE_ENDPOINT=${{ secrets.REACT_APP_FILE_ENDPOINT }}
             REACT_APP_API_FILE_ENDPOINT=${{ secrets.REACT_APP_API_FILE_ENDPOINT }}
             REACT_APP_ENDPOINT=${{ secrets.REACT_APP_ENDPOINT }}
+            REACT_APP_ALARM_ENDPOINT=${{ secrets.REACT_APP_ALARM_ENDPOINT }}
 
   deploy:
     name: Deploy to K3s
