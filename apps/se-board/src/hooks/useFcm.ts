@@ -22,7 +22,7 @@ export const useFcm = (isLoggedIn: boolean) => {
     }
 
     // iOS Safari 등 FCM 미지원 환경 체크
-    if (!isFcmSupported() || !messaging) return;
+    if (!isFcmSupported()) return;
 
     let unsubscribe: (() => void) | undefined;
     try {
@@ -34,7 +34,7 @@ export const useFcm = (isLoggedIn: boolean) => {
     Notification.requestPermission().then((permission) => {
       if (permission !== "granted") return;
 
-      getToken(messaging!, { vapidKey: VAPID_KEY })
+      getToken(messaging, { vapidKey: VAPID_KEY })
         .then((token) => {
           if (token) {
             console.log("[FCM] 토큰:", token);

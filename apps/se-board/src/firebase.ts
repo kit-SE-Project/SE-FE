@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getMessaging, isSupported } from "firebase/messaging";
+import { getMessaging } from "firebase/messaging";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDgGzCZz0nn13HbdFiUtlUep0EhwAa4byg",
@@ -12,7 +12,4 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 
-// iOS Safari 등 미지원 환경에서 getMessaging() 에러 방지
-export const messaging = await isSupported()
-  .then((supported) => (supported ? getMessaging(app) : null))
-  .catch(() => null);
+export const messaging = getMessaging(app);
