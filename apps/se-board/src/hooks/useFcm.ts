@@ -5,7 +5,8 @@ import { deleteFcmToken, registerFcmToken } from "@/api/fcm";
 import { isMaintainLogin } from "@/api/storage";
 import { messaging } from "@/firebase";
 
-const VAPID_KEY = process.env.REACT_APP_FIREBASE_VAPID_KEY;
+const VAPID_KEY =
+  "BFFYEnN0U5wVDKbnY_7by3laYurljwZe21yRsJ8vaM9IGW8yHYM_W3QYvQyrgr86MM5WBz46INGL8kZJbq7Pm4c";
 
 export const useFcm = (isLoggedIn: boolean) => {
   useEffect(() => {
