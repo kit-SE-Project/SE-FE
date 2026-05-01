@@ -17,6 +17,7 @@ import { MemberFrameInfo } from "@types";
 import React, { ReactNode, useEffect, useRef, useState } from "react";
 import { IconType } from "react-icons";
 import {
+  BsBell,
   BsBookmark,
   BsCameraFill,
   BsChatLeftText,
@@ -447,13 +448,13 @@ export const ProfilePage = () => {
                       </Collapse>
                     </Box>
                     {/* 알림 설정 */}
-                    {/* <Flex
+                    <Flex
                       onClick={() => navigate("/profile/notification/setting")}
                       alignItems="center"
                       w="full"
                       py="1rem"
                       px="1rem"
-                      color="gray.7"
+                      color={titleColor}
                     >
                       <Icon
                         as={BsBell}
@@ -471,7 +472,7 @@ export const ProfilePage = () => {
                         boxSize={{ base: "1rem", sm: "1.25rem" }}
                         ml="auto"
                       />
-                    </Flex> */}
+                    </Flex>
                     {/* 비밀번호 변경 */}
                     <Flex
                       onClick={() => navigate("/profile/password/edit")}
