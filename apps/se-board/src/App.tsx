@@ -15,6 +15,7 @@ import {
 import {
   AdminMenuEdit,
   CommentManage,
+  DepartmentBoardDownloadPage,
   GeneralSetting,
   MainPageSetting,
   MemberGroupManage,
@@ -228,6 +229,10 @@ const MenuRouter = () => {
         {
           path: "comments",
           element: <CommentManage />,
+        },
+        {
+          path: "department-board-api-download",
+          element: <DepartmentBoardDownloadPage />,
         },
         {
           path: "mainPageMenu",

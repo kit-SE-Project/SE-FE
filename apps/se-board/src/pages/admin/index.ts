@@ -1,5 +1,6 @@
 export * from "./AdminMenuEditPage";
 export * from "./CommentManage";
+export * from "./DepartmentBoardDownloadPage";
 export * from "./GeneralSetting";
 export * from "./MainPageSetting";
 export * from "./MemberGroupManage";

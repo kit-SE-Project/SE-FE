@@ -19,6 +19,16 @@ module.exports = {
       );
 
       webpackConfig.resolve.plugins.splice(scopePluginIndex, 1);
+
+      const eslintPlugin = webpackConfig.plugins.find(
+        ({ constructor }) =>
+          constructor && constructor.name === "ESLintWebpackPlugin"
+      );
+
+      if (eslintPlugin) {
+        eslintPlugin.options.cache = false;
+      }
+
       return webpackConfig;
     },
   },
