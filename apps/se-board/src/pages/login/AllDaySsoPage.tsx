@@ -7,7 +7,7 @@ import {
   allDayStartUrl,
   authorizeAllDay,
 } from "@/api/allday";
-import { clearStoredAuthTokens, getStoredAccessToken } from "@/api/storage";
+import { clearStoredAuthTokens } from "@/api/storage";
 
 export function AllDaySsoPage() {
   const navigate = useNavigate();
@@ -20,7 +20,6 @@ export function AllDaySsoPage() {
       authorization.current = (async () => {
         const login = allDayLoginFromBrowser();
         if (!login) throw new Error("Invalid AllDay login");
-        if (!getStoredAccessToken()) return null;
         try {
           return await authorizeAllDay(login);
         } catch (failure) {

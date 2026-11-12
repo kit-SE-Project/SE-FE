@@ -1,4 +1,4 @@
-import { _axios, getJWTHeader } from "./axiosInstance";
+import { _axios, getJWTHeader, refreshStoredAccessToken } from "./axiosInstance";
 
 const pendingKey = "seboard.allday.sso";
 const identifier = /^[A-Za-z0-9_-]{43}$/;
@@ -57,11 +57,13 @@ export function allDayLoginFromBrowser(): PendingLogin | null {
 }
 
 export async function authorizeAllDay(login: PendingLogin): Promise<string> {
+  if (!getJWTHeader().Authorization) await refreshStoredAccessToken();
   const { data } = await _axios<{ callbackUrl: string }>({
     url: "allday/sso/authorize",
     method: "POST",
     data: { state: login.state, codeChallenge: login.codeChallenge },
     headers: getJWTHeader(),
+    preserveAuthRoute: true,
   });
   const destination = new URL(data.callbackUrl);
   const codes = destination.searchParams.getAll("code");

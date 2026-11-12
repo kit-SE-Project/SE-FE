@@ -1,8 +1,9 @@
-import { _axios } from "./axiosInstance";
+import { _axios, getJWTHeader, refreshStoredAccessToken } from "./axiosInstance";
 
 jest.mock("./axiosInstance", () => ({
   _axios: jest.fn(),
-  getJWTHeader: () => ({ Authorization: "Bearer board-test-token" }),
+  getJWTHeader: jest.fn(() => ({ Authorization: "Bearer board-test-token" })),
+  refreshStoredAccessToken: jest.fn(),
 }));
 
 const state = "s".repeat(43);
@@ -23,6 +24,7 @@ beforeEach(() => {
   sessionStorage.clear();
   window.history.replaceState(null, "", "/allday/sso#state=" + state + "&code_challenge=" + challenge);
   jest.clearAllMocks();
+  (getJWTHeader as jest.Mock).mockReturnValue({ Authorization: "Bearer board-test-token" });
 });
 
 afterEach(() => {
@@ -44,6 +46,7 @@ test("resumes through SE login and redirects with only the code and state", asyn
     method: "POST",
     data: { state, codeChallenge: challenge },
     headers: { Authorization: "Bearer board-test-token" },
+    preserveAuthRoute: true,
   });
   expect(api.pendingAllDayLoginPath()).toBeNull();
 });
@@ -59,4 +62,20 @@ test("rejects a different callback origin, path, or state", async () => {
     (_axios as jest.Mock).mockResolvedValue({ data: { callbackUrl } });
     await expect(api.authorizeAllDay(pending)).rejects.toThrow("Invalid AllDay callback");
   }
+});
+
+test("refreshes the existing Board login before authorizing when access is missing", async () => {
+  const api = loadApi();
+  const pending = api.allDayLoginFromBrowser()!;
+  (getJWTHeader as jest.Mock).mockReturnValueOnce({ Authorization: "" })
+    .mockReturnValueOnce({ Authorization: "Bearer refreshed-board-token" });
+  (refreshStoredAccessToken as jest.Mock).mockResolvedValueOnce(undefined);
+  const callbackUrl = origin + "/api/v1/sso/callback?code=" + code + "&state=" + state;
+  (_axios as jest.Mock).mockResolvedValueOnce({ data: { callbackUrl } });
+
+  expect(await api.authorizeAllDay(pending)).toBe(callbackUrl);
+  expect(refreshStoredAccessToken).toHaveBeenCalledTimes(1);
+  expect(_axios).toHaveBeenCalledWith(expect.objectContaining({
+    headers: { Authorization: "Bearer refreshed-board-token" },
+  }));
 });
