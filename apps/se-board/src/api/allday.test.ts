@@ -1,0 +1,62 @@
+import { _axios } from "./axiosInstance";
+
+jest.mock("./axiosInstance", () => ({
+  _axios: jest.fn(),
+  getJWTHeader: () => ({ Authorization: "Bearer board-test-token" }),
+}));
+
+const state = "s".repeat(43);
+const challenge = "p".repeat(43);
+const code = "c".repeat(43);
+const origin = "https://rental.example";
+
+function loadApi(): typeof import("./allday") {
+  let api!: typeof import("./allday");
+  jest.isolateModules(() => {
+    api = require("./allday");
+  });
+  return api;
+}
+
+beforeEach(() => {
+  process.env.REACT_APP_ALLDAY_ORIGIN = origin;
+  sessionStorage.clear();
+  window.history.replaceState(null, "", "/allday/sso#state=" + state + "&code_challenge=" + challenge);
+  jest.clearAllMocks();
+});
+
+afterEach(() => {
+  delete process.env.REACT_APP_ALLDAY_ORIGIN;
+});
+
+test("resumes through SE login and redirects with only the code and state", async () => {
+  const api = loadApi();
+  const pending = api.allDayLoginFromBrowser()!;
+  expect(window.location.hash).toBe("");
+  expect(api.pendingAllDayLoginPath()).toBe("/allday/sso");
+  expect(api.allDayStartUrl).toBe(origin + "/api/v1/sso/start");
+  const callbackUrl = origin + "/api/v1/sso/callback?code=" + code + "&state=" + state;
+  (_axios as jest.Mock).mockResolvedValue({ data: { callbackUrl } });
+
+  expect(await api.authorizeAllDay(pending)).toBe(callbackUrl);
+  expect(_axios).toHaveBeenCalledWith({
+    url: "allday/sso/authorize",
+    method: "POST",
+    data: { state, codeChallenge: challenge },
+    headers: { Authorization: "Bearer board-test-token" },
+  });
+  expect(api.pendingAllDayLoginPath()).toBeNull();
+});
+
+test("rejects a different callback origin, path, or state", async () => {
+  const api = loadApi();
+  const pending = api.allDayLoginFromBrowser()!;
+  for (const callbackUrl of [
+    "https://elsewhere.example/api/v1/sso/callback?code=" + code + "&state=" + state,
+    origin + "/another-path?code=" + code + "&state=" + state,
+    origin + "/api/v1/sso/callback?code=" + code + "&state=" + "x".repeat(43),
+  ]) {
+    (_axios as jest.Mock).mockResolvedValue({ data: { callbackUrl } });
+    await expect(api.authorizeAllDay(pending)).rejects.toThrow("Invalid AllDay callback");
+  }
+});

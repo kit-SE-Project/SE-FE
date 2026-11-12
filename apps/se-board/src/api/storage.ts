@@ -48,3 +48,9 @@ export const clearSotredRefreshToken = () => {
   sessionStorage.removeItem(REFRESH_TOKEN_KEY);
   localStorage.removeItem(REFRESH_TOKEN_KEY);
 };
+
+export const clearStoredAuthTokens = () => {
+  clearSotredRefreshToken();
+  sessionStorage.removeItem(ACCESS_TOKEN_KEY);
+  localStorage.removeItem(ACCESS_TOKEN_KEY);
+};

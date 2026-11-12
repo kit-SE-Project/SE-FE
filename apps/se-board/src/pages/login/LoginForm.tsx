@@ -14,10 +14,10 @@ import { Link } from "react-router-dom";
 
 import { useLogin } from "@/react-query/hooks/auth";
 
-export const LoginForm = () => {
+export const LoginForm = ({ onAuthenticated }: { onAuthenticated?: () => void }) => {
   const [maintainLogin, setMaintainLogin] = useBoolean();
 
-  const { mutate: login, isLoading, error } = useLogin(maintainLogin);
+  const { mutate: login, isLoading, error } = useLogin(maintainLogin, onAuthenticated);
 
   const {
     register,

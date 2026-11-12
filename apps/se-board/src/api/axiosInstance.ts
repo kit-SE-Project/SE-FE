@@ -51,13 +51,13 @@ const flushQueue = (err: unknown, newToken: string | null) => {
 
 instance.interceptors.response.use(
   (res) => {
-    if (process.env.NODE_ENV !== "production") {
+    if (process.env.NODE_ENV !== "production" && res.config.url !== "allday/sso/authorize") {
       console.log(res);
     }
     return res;
   },
   async (error) => {
-    if (process.env.NODE_ENV !== "production") {
+    if (process.env.NODE_ENV !== "production" && error.config?.url !== "allday/sso/authorize") {
       console.error(error);
     }
 

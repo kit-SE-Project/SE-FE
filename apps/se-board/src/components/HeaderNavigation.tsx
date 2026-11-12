@@ -30,6 +30,7 @@ import { BsBoxArrowUpRight, BsList } from "react-icons/bs";
 import { NavLink } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 
+import { allDayStartUrl } from "@/api/allday";
 import { GradientAvatar } from "@/components/common/GradientAvatar";
 import { NotificationBell } from "@/components/notification/NotificationBell";
 import { useNavigatePage, useWindowSize } from "@/hooks";
@@ -123,9 +124,14 @@ export const DesktopHeaderNavigation = ({
             overflowX="auto"
             px="1rem"
           >
-            {menuList.map((menu) => (
+            {menuList.filter((menu) => !allDayStartUrl || menu.name !== "서버 대여").map((menu) => (
               <DesktopNavItem key={menu.name} {...menu} />
             ))}
+            {allDayStartUrl && (
+              <WrapItem flexShrink={0} m="0px" fontSize="1.125rem" fontWeight="bold">
+                <ExternalLink href={allDayStartUrl} color={color} py="1rem">서버 대여</ExternalLink>
+              </WrapItem>
+            )}
           </Box>
         </Box>
 
@@ -261,9 +267,14 @@ const DrawerNavigation = ({
         </DrawerHeader>
         <DrawerBody>
           <Wrap>
-            {menuList.map((item, i) => (
+            {menuList.filter((menu) => !allDayStartUrl || menu.name !== "서버 대여").map((item, i) => (
               <DrawerNavItem key={i} {...item} onClick={onClose} />
             ))}
+            {allDayStartUrl && (
+              <WrapItem w="full" m="0px" fontSize="1.125rem" fontWeight="bold">
+                <ExternalLink href={allDayStartUrl} color={color} p="1rem" w="full">서버 대여</ExternalLink>
+              </WrapItem>
+            )}
           </Wrap>
         </DrawerBody>
         <DrawerFooter borderTopWidth="1px">
