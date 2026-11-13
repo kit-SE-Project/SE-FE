@@ -39,7 +39,8 @@ jobs:
 
       - uses: docker/build-push-action@v5
         with:
-          context: apps/se-board
+          context: .
+          file: Dockerfile.web
           push: true
           tags: |
             ${{ env.REGISTRY }}/${{ steps.vars.outputs.image_name }}:${{ steps.vars.outputs.sha }}
@@ -50,6 +51,7 @@ jobs:
             REACT_APP_API_FILE_ENDPOINT=${{ secrets.REACT_APP_API_FILE_ENDPOINT }}
             REACT_APP_ENDPOINT=${{ secrets.REACT_APP_ENDPOINT }}
             REACT_APP_ALARM_ENDPOINT=${{ secrets.REACT_APP_ALARM_ENDPOINT }}
+            REACT_APP_ALLDAY_ORIGIN=${{ vars.ALLDAY_ORIGIN }}
 
   deploy:
     name: Deploy to K3s

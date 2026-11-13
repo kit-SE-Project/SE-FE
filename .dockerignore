@@ -1,0 +1,17 @@
+.git
+**/.git
+**/node_modules
+**/.expo
+**/dist
+apps/se-board/build
+**/coverage
+**/.local-only
+**/artifacts
+**/.env
+**/.env.*
+!**/.env.example
+**/*.log
+**/*.pem
+**/*.key
+**/*.p12
+**/*.pfx

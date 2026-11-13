@@ -1,0 +1,13 @@
+{
+  "expo": {
+    "name": "Server Allday",
+    "slug": "server-allday",
+    "version": "1.0.0",
+    "platforms": ["web"],
+    "icon": "./src/asset/SE_LOGO.png",
+    "orientation": "default",
+    "userInterfaceStyle": "light",
+    "web": { "bundler": "metro", "name": "Server Allday · 서버 대여", "lang": "ko", "favicon": "./src/asset/SE_LOGO.png" },
+    "description": "SE 게시판 서버 대여 웹"
+  }
+}
