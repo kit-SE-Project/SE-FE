@@ -7,7 +7,8 @@ const portalPath = "/allday/sso";
 type PendingLogin = { state: string; codeChallenge: string; expiresAt: number };
 
 function rentalOrigin() {
-  const configured = process.env.REACT_APP_ALLDAY_ORIGIN;
+  const configured = process.env.REACT_APP_ALLDAY_ORIGIN ||
+    (typeof window !== "undefined" ? window.location.origin : "");
   if (!configured) return null;
   try {
     const url = new URL(configured);
@@ -23,6 +24,7 @@ function rentalOrigin() {
 
 const origin = rentalOrigin();
 export const allDayStartUrl = origin ? origin + "/api/v1/sso/start" : null;
+export const allDayWebUrl = origin ? origin + "/allday/" : null;
 
 export function readPendingAllDayLogin(): PendingLogin | null {
   try {

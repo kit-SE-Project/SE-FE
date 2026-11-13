@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="theme-color" content="#f7f9fc" />
+    <title>Server Allday · 서버 대여</title>
+    <style id="expo-reset">
+      html, body { height: 100%; margin: 0; background: #f7f9fc; }
+      body { overflow: hidden; }
+      #root { display: flex; height: 100%; flex: 1; }
+      #app-startup { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 24px; font-family: system-ui, 'Malgun Gothic', sans-serif; color: #142033; }
+      #app-startup p { margin: 0; }
+      #app-startup .startup-title { font-size: 20px; font-weight: 700; }
+      #app-startup .startup-message { font-size: 14px; color: #7386a2; }
+      .startup-spinner { width: 28px; height: 28px; border: 3px solid #dce6f5; border-top-color: #2563eb; border-radius: 50%; animation: startup-spin .8s linear infinite; }
+      #startup-retry { border: 1px solid #dce6f5; border-radius: 8px; background: white; padding: 10px 16px; color: #142033; cursor: pointer; }
+      @keyframes startup-spin { to { transform: rotate(360deg); } }
+      @media (prefers-reduced-motion: reduce) { .startup-spinner { animation: none; } }
+    </style>
+  </head>
+  <body>
+    <noscript>서버 대여 서비스를 이용하려면 JavaScript를 활성화해 주세요.</noscript>
+    <div id="root">
+      <main id="app-startup" role="status" aria-live="polite">
+        <span class="startup-spinner" aria-hidden="true"></span>
+        <p class="startup-title">Server Allday</p>
+        <p id="startup-message" class="startup-message">화면을 준비하고 있습니다.</p>
+        <button id="startup-retry" hidden onclick="location.reload()">다시 불러오기</button>
+      </main>
+    </div>
+    <script>
+      // React replaces this placeholder when the application mounts.
+      window.addEventListener('error', function (event) {
+        if (!document.getElementById('app-startup') || event.target.tagName !== 'SCRIPT') return;
+        document.getElementById('startup-message').textContent = '화면을 불러오지 못했습니다. 연결을 확인하고 다시 시도하세요.';
+        document.getElementById('startup-retry').hidden = false;
+      }, true);
+    </script>
+  </body>
+</html>

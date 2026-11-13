@@ -39,7 +39,8 @@ jobs:
 
       - uses: docker/build-push-action@v5
         with:
-          context: apps/se-board
+          context: .
+          file: Dockerfile.web
           push: true
           tags: |
             ${{ env.REGISTRY }}/${{ steps.vars.outputs.image_name }}:${{ steps.vars.outputs.sha }}

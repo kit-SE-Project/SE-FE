@@ -1,0 +1,39 @@
+# Dependencies and generated Expo/native builds
+node_modules/
+.expo/
+dist/
+android/
+ios/
+web-build/
+coverage/
+*.tsbuildinfo
+
+# Local configuration and credentials (only the template is shared)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Local archives, reports, and temporary files
+.local-only/
+artifacts/
+output/
+preview/
+tmp/
+API_AUDIT.json
+*.log
+*.tmp
+*.bak
+
+# Editor and OS metadata
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Tool-generated Java upgrade metadata is unrelated to this frontend
+.github/modernize/

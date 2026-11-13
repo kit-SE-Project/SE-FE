@@ -1,5 +1,13 @@
 node_modules
 dist
-/build
+build/
 
 .eslintcache
+.env
+.env.*
+!.env.example
+.expo/
+coverage/
+artifacts/
+.local-only/
+*.log

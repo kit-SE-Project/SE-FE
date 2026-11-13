@@ -1,3 +1,4 @@
+/** @jest-environment node */
 import { _axios, getJWTHeader, refreshStoredAccessToken } from "./axiosInstance";
 
 jest.mock("./axiosInstance", () => ({
@@ -10,10 +11,27 @@ const state = "s".repeat(43);
 const challenge = "p".repeat(43);
 const code = "c".repeat(43);
 const origin = "https://rental.example";
+const stored = new Map<string, string>();
+let browserUrl = new URL("https://board.example/allday/sso");
+beforeAll(() => {
+  Object.defineProperty(globalThis, "sessionStorage", { configurable: true, value: {
+    getItem: (key: string) => stored.get(key) ?? null,
+    setItem: (key: string, value: string) => stored.set(key, value),
+    removeItem: (key: string) => stored.delete(key), clear: () => stored.clear(),
+  } });
+  Object.defineProperty(globalThis, "window", { configurable: true, value: {
+    get location() { return browserUrl; },
+    history: { state: null, replaceState: (_state: unknown, _title: string, url: string) => { browserUrl = new URL(url, browserUrl); } },
+  } });
+});
+afterAll(() => {
+  Reflect.deleteProperty(globalThis, "window"); Reflect.deleteProperty(globalThis, "sessionStorage");
+});
 
 function loadApi(): typeof import("./allday") {
   let api!: typeof import("./allday");
   jest.isolateModules(() => {
+    jest.doMock("./axiosInstance", () => ({ _axios, getJWTHeader, refreshStoredAccessToken }));
     api = require("./allday");
   });
   return api;
@@ -37,6 +55,7 @@ test("resumes through SE login and redirects with only the code and state", asyn
   expect(window.location.hash).toBe("");
   expect(api.pendingAllDayLoginPath()).toBe("/allday/sso");
   expect(api.allDayStartUrl).toBe(origin + "/api/v1/sso/start");
+  expect(api.allDayWebUrl).toBe(origin + "/allday/");
   const callbackUrl = origin + "/api/v1/sso/callback?code=" + code + "&state=" + state;
   (_axios as jest.Mock).mockResolvedValue({ data: { callbackUrl } });
 

@@ -15,7 +15,7 @@ export const getJWTHeader = () => {
 };
 
 const instance: AxiosInstance = axios.create({
-  baseURL: process.env.REACT_APP_API_ENDPOINT,
+  baseURL: process.env.REACT_APP_API_ENDPOINT || "https://seboard.site/v1",
   timeout: 10000,
 });
 
@@ -86,7 +86,12 @@ instance.interceptors.response.use(
     const failure = error.response?.data ?? error;
     if (failure.code === 108 && request && request.url !== "refresh" && !request.authRetried) {
       try {
-        await refreshStoredAccessToken();
+        const headers = request.headers;
+        const sent = typeof headers?.get === "function"
+          ? headers.get("Authorization")
+          : headers?.Authorization;
+        const current = getJWTHeader().Authorization;
+        if (!current || current === sent) await refreshStoredAccessToken();
       } catch (refreshError) {
         const refreshCode = (refreshError as { code?: number })?.code;
         if (!request.preserveAuthRoute) redirectForAuthError(refreshCode === 106 ? 107 : refreshCode);
