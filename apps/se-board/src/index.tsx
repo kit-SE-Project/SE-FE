@@ -13,7 +13,6 @@ import { queryClient } from "@/react-query";
 import { theme } from "@/styles/chakraTheme";
 
 import { App } from "./App";
-import { WebErrorBoundary } from "./components/WebErrorBoundary";
 import reportWebVitals from "./reportWebVitals";
 import * as serviceWorker from "./serviceWorker";
 
@@ -27,7 +26,7 @@ root.render(
       <ChakraProvider theme={theme}>
         <QueryClientProvider client={queryClient}>
           <ColorModeScript initialColorMode={"system"} />
-          <WebErrorBoundary><App /></WebErrorBoundary>
+          <App />
           <ReactQueryDevtools />
         </QueryClientProvider>
       </ChakraProvider>

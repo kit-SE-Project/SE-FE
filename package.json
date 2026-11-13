@@ -15,11 +15,7 @@
     "prettier": "^2.8.4"
   },
   "scripts": {
-    "prepare": "husky install",
-    "build:allday": "node scripts/build-allday.cjs",
-    "build:board": "node scripts/build-board.cjs",
-    "preview:web": "node scripts/preview-web.cjs",
-    "test:web": "node --test tests/*.test.cjs"
+    "prepare": "husky install"
   },
   "lint-staged": {
     "**/*.*(js|ts|tsx)": [

@@ -95,7 +95,7 @@ export const useFetchOAuthUserBasicInfo = (id: string) => {
   });
 };
 
-export const useLogin = (maintainLogin = false, onAuthenticated?: () => void) => {
+export const useLogin = (maintainLogin: boolean = false) => {
   const queryClient = useQueryClient();
   const setUserState = useSetRecoilState(userState);
   const { goToMainPage } = useNavigatePage();
@@ -124,8 +124,7 @@ export const useLogin = (maintainLogin = false, onAuthenticated?: () => void) =>
         }));
       });
 
-      if (onAuthenticated) onAuthenticated();
-      else goToMainPage();
+      goToMainPage();
       queryClient.invalidateQueries([queryKeys.menuList]);
     },
   });

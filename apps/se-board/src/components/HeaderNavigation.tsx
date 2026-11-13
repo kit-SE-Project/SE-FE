@@ -30,7 +30,6 @@ import { BsBoxArrowUpRight, BsList } from "react-icons/bs";
 import { NavLink } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 
-import { allDayWebUrl } from "@/api/allday";
 import { GradientAvatar } from "@/components/common/GradientAvatar";
 import { NotificationBell } from "@/components/notification/NotificationBell";
 import { useNavigatePage, useWindowSize } from "@/hooks";
@@ -127,11 +126,6 @@ export const DesktopHeaderNavigation = ({
             {menuList.map((menu) => (
               <DesktopNavItem key={menu.name} {...menu} />
             ))}
-            {allDayWebUrl && (
-              <WrapItem flexShrink={0} m="0px" fontSize="1.125rem" fontWeight="bold">
-                <ExternalLink href={allDayWebUrl} color={color} py="1rem">서버 대여 (테스트중)</ExternalLink>
-              </WrapItem>
-            )}
           </Box>
         </Box>
 
@@ -270,11 +264,6 @@ const DrawerNavigation = ({
             {menuList.map((item, i) => (
               <DrawerNavItem key={i} {...item} onClick={onClose} />
             ))}
-            {allDayWebUrl && (
-              <WrapItem w="full" m="0px" fontSize="1.125rem" fontWeight="bold">
-                <ExternalLink href={allDayWebUrl} color={color} p="1rem" w="full">서버 대여 (테스트중)</ExternalLink>
-              </WrapItem>
-            )}
           </Wrap>
         </DrawerBody>
         <DrawerFooter borderTopWidth="1px">

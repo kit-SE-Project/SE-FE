@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { BrowserRouter, useLocation, useRoutes } from "react-router-dom";
+import { BrowserRouter, useRoutes } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 
 import { AdminLayout, MainLayout } from "@/components/layouts";
@@ -29,7 +29,6 @@ import RecruitManagePage from "./pages/admin/RecruitManagePage";
 import SkillManagePage from "./pages/admin/SkillManagePage";
 import { BoardPage } from "./pages/board/BoardPage";
 import { PasswordChangeWithoutLoginPage } from "./pages/login";
-import { AllDaySsoPage } from "./pages/login/AllDaySsoPage";
 import { MainPage } from "./pages/main/MainPage";
 import { PageNotFound } from "./pages/PageNotFound";
 import { BookmarkPage } from "./pages/profile/BookmarkPage";
@@ -256,6 +255,10 @@ const MenuRouter = () => {
     {
       children: [
         {
+          path: "login",
+          element: <LoginPage />,
+        },
+        {
           path: "passwordChange",
           element: <PasswordChangeWithoutLoginPage />,
         },
@@ -276,20 +279,12 @@ const MenuRouter = () => {
   ]);
 };
 
-const BoardRoutes = () => {
+export const App = () => {
   useFetchUserSimpleInfo();
-  return <MenuRouter />;
-};
 
-const AppRoutes = () => {
-  const path = useLocation().pathname.replace(/\/+$/, "").toLowerCase();
-  if (path === "/allday/sso") return <AllDaySsoPage />;
-  if (path === "/login") return <LoginPage />;
-  return <BoardRoutes />;
+  return (
+    <BrowserRouter>
+      <MenuRouter />
+    </BrowserRouter>
+  );
 };
-
-export const App = () => (
-  <BrowserRouter>
-    <AppRoutes />
-  </BrowserRouter>
-);

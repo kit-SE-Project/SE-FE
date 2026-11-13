@@ -1,7 +1,5 @@
 packages:
   # executable/launchable applications
   - "apps/*"
-  # Expo web keeps its own npm lockfile and React version.
-  - "!apps/server-allday"
   # all packages in subdirs of packages/ and components/
   - "packages/*"
