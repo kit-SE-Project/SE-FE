@@ -2,6 +2,7 @@
 import React from "react";
 import { Menu } from "@types";
 
+let mockHasAuth = false;
 jest.mock("@/api/allday", () => ({ allDayWebUrl: "/allday/" }));
 jest.mock("@/hooks", () => ({
   useNavigatePage: () => ({}),
@@ -11,7 +12,7 @@ jest.mock("@/react-query/hooks/auth", () => ({
   useLogout: () => ({ mutate: jest.fn() }),
 }));
 jest.mock("@/store/user", () => ({
-  useUserState: () => ({ hasAuth: false, userInfo: {} }),
+  useUserState: () => ({ hasAuth: mockHasAuth, userInfo: { nickname: "테스트 사용자" } }),
 }));
 jest.mock("@/components/notification/NotificationBell", () => ({
   NotificationBell: () => null,
@@ -64,6 +65,7 @@ beforeAll(() => {
 afterEach(() => {
   dispose?.();
   dispose = undefined;
+  mockHasAuth = false;
 });
 afterAll(() => {
   dom.window.close();
@@ -113,6 +115,34 @@ const menus = [
     subMenu: [],
   },
 ] as unknown as Menu[];
+
+test("desktop menus remain visible when login controls make the navigation overflow", () => {
+  const { DesktopHeaderNavigation } = require("./HeaderNavigation");
+  const width = jest.spyOn(HTMLElement.prototype, "clientWidth", "get").mockReturnValue(300);
+  const scrollWidth = jest.spyOn(HTMLElement.prototype, "scrollWidth", "get").mockReturnValue(900);
+  function LoginTransition() {
+    const [loggedIn, setLoggedIn] = React.useState(false);
+    mockHasAuth = loggedIn;
+    return <>
+      <button onClick={() => setLoggedIn(true)}>시험 로그인</button>
+      <DesktopHeaderNavigation menuList={menus} />
+    </>;
+  }
+  try {
+    const { container, act } = render(<LoginTransition />);
+    const login = Array.from(container.querySelectorAll("button")).find(button => button.textContent === "시험 로그인")!;
+    act(() => login.click());
+    const navigation = container.querySelector("nav")!;
+    expect(window.getComputedStyle(navigation).visibility).not.toBe("hidden");
+    expect(window.getComputedStyle(navigation).display).not.toBe("none");
+    expect(navigation.querySelector('a[href="/notice"]')).toBeTruthy();
+    expect(navigation.querySelector('a[href="/allday/"]')).toBeTruthy();
+    expect(container.textContent).toContain("테스트 사용자");
+  } finally {
+    width.mockRestore();
+    scrollWidth.mockRestore();
+  }
+});
 
 test("empty loading menus show progress alongside the test rental link", () => {
   const { DesktopHeaderNavigation } = require("./HeaderNavigation");

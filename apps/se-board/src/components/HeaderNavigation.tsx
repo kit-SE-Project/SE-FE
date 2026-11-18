@@ -26,7 +26,6 @@ import {
   WrapItem,
 } from "@chakra-ui/react";
 import { Menu } from "@types";
-import { useEffect, useRef, useState } from "react";
 import { BsBoxArrowUpRight, BsList } from "react-icons/bs";
 import { NavLink } from "react-router-dom";
 import { useRecoilValue } from "recoil";
@@ -122,28 +121,16 @@ export const DesktopHeaderNavigation = ({
 }: MenuLoadProps & {
   menuList: Menu[];
 }) => {
-  const [viewMode, setViewMode] = useState<"desktop" | "tablet">("desktop");
   const windowSize = useWindowSize();
+  const viewMode = windowSize.width >= 992 ? "desktop" : "tablet";
   const { isOpen, onOpen, onClose } = useDisclosure();
   const { goToLoginPage, goToMyPage } = useNavigatePage();
   const { mutate: logout } = useLogout();
   const { userInfo, hasAuth } = useUserState();
-  const navRef = useRef<any>();
 
   const headerBgColor = useColorModeValue("white", "gray.800");
   const color = useColorModeValue("gray.7", "whiteAlpha.800");
 
-  useEffect(() => {
-    if (!navRef.current) return;
-    if (
-      992 <= windowSize.width &&
-      navRef.current.clientWidth === navRef.current.scrollWidth
-    ) {
-      setViewMode("desktop");
-    } else {
-      setViewMode("tablet");
-    }
-  }, [windowSize, menuList, menuLoading, menuError]);
   return (
     <Center
       bgColor={headerBgColor}
@@ -158,22 +145,24 @@ export const DesktopHeaderNavigation = ({
         w="full"
         align="center"
         justify="space-between"
+        gap="1rem"
         px="1rem"
       >
         <Logo size="3.5rem" />
         <Box
           as="nav"
-          display="flex"
+          display={viewMode === "desktop" ? "flex" : "none"}
           justifyContent="center"
-          visibility={viewMode === "desktop" ? "visible" : "hidden"}
-          w={992 <= windowSize.width ? "auto" : "0"}
-          h={992 <= windowSize.width ? "auto" : "0"}
+          flex="1"
+          minW="0"
         >
           <Box
-            ref={navRef}
             display="flex"
+            minW="0"
+            maxW="full"
             rowGap="1rem"
-            columnGap="2rem"
+            columnGap="1rem"
+            whiteSpace="nowrap"
             overflowX="auto"
             px="1rem"
           >
