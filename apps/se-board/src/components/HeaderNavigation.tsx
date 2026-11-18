@@ -18,7 +18,6 @@ import {
   Flex,
   Icon,
   Link as ExternalLink,
-  Spinner,
   Text,
   useColorModeValue,
   useDisclosure,
@@ -78,14 +77,7 @@ export const MenuLoadNotice = ({
   retryMenus,
   empty,
 }: MenuLoadProps & { empty: boolean }) => {
-  if (menuLoading && empty) {
-    return (
-      <Flex role="status" align="center" gap="2" p="3">
-        <Spinner size="sm" />
-        <Text whiteSpace="nowrap">메뉴를 불러오는 중입니다.</Text>
-      </Flex>
-    );
-  }
+  if (menuLoading && empty) return null;
   if (!menuError && !empty) return null;
   return (
     <Flex

@@ -149,9 +149,7 @@ test("desktop test rental is available only after opening the right menu", () =>
   const { container, act } = render(
     <DesktopHeaderNavigation menuList={[]} menuLoading />
   );
-  expect(container.querySelector('[role="status"]')?.textContent).toContain(
-    "메뉴를 불러오는 중"
-  );
+  expect(container.querySelector('[role="status"]')).toBeNull();
   expect(document.querySelector('a[href="/allday/"]')).toBeNull();
   const menuButton = container.querySelector<HTMLButtonElement>('button[aria-label="메뉴 열기"]')!;
   expect(menuButton).toBeTruthy();
