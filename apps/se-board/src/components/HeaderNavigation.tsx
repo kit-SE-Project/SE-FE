@@ -176,18 +176,6 @@ export const DesktopHeaderNavigation = ({
             {menuList.map((menu) => (
               <DesktopNavItem key={menu.name} {...menu} />
             ))}
-            {allDayWebUrl && (
-              <WrapItem
-                flexShrink={0}
-                m="0px"
-                fontSize="1.125rem"
-                fontWeight="bold"
-              >
-                <ExternalLink href={allDayWebUrl} color={color} py="1rem">
-                  서버 대여 (테스트중)
-                </ExternalLink>
-              </WrapItem>
-            )}
           </Box>
         </Box>
 
@@ -239,28 +227,24 @@ export const DesktopHeaderNavigation = ({
               </Button>
             ))}
 
-          {/* 태블릿/모바일: 햄버거 */}
-          {viewMode === "tablet" && (
-            <>
-              <Button
-                onClick={onOpen}
-                variant="ghost"
-                p="0"
-                aria-label="메뉴 열기"
-              >
-                <Icon as={BsList} color={color} boxSize="2rem" />
-              </Button>
-              <DrawerNavigation
-                isOpen={isOpen}
-                onClose={onClose}
-                menuList={menuList}
-                menuLoading={menuLoading}
-                menuRefreshing={menuRefreshing}
-                menuError={menuError}
-                retryMenus={retryMenus}
-              />
-            </>
-          )}
+          {/* 모든 화면에서 테스트 대여 링크를 여는 메뉴 */}
+          <Button
+            onClick={onOpen}
+            variant="ghost"
+            p="0"
+            aria-label="메뉴 열기"
+          >
+            <Icon as={BsList} color={color} boxSize="2rem" />
+          </Button>
+          <DrawerNavigation
+            isOpen={isOpen}
+            onClose={onClose}
+            menuList={menuList}
+            menuLoading={menuLoading}
+            menuRefreshing={menuRefreshing}
+            menuError={menuError}
+            retryMenus={retryMenus}
+          />
         </Flex>
       </Flex>
     </Center>
