@@ -1,0 +1,34 @@
+FROM node:22.14.0-alpine AS board-build
+WORKDIR /build/board
+COPY apps/se-board/package.json apps/se-board/package-lock.json ./
+COPY apps/se-board/libs ./libs
+RUN npm ci --legacy-peer-deps --no-audit --no-fund
+COPY apps/se-board/ ./
+ARG REACT_APP_API_ENDPOINT
+ARG REACT_APP_FILE_ENDPOINT
+ARG REACT_APP_API_FILE_ENDPOINT
+ARG REACT_APP_ENDPOINT
+ARG REACT_APP_ALARM_ENDPOINT
+ARG REACT_APP_ALLDAY_ORIGIN
+ENV REACT_APP_API_ENDPOINT=$REACT_APP_API_ENDPOINT \
+    REACT_APP_FILE_ENDPOINT=$REACT_APP_FILE_ENDPOINT \
+    REACT_APP_API_FILE_ENDPOINT=$REACT_APP_API_FILE_ENDPOINT \
+    REACT_APP_ENDPOINT=$REACT_APP_ENDPOINT \
+    REACT_APP_ALARM_ENDPOINT=$REACT_APP_ALARM_ENDPOINT \
+    REACT_APP_ALLDAY_ORIGIN=$REACT_APP_ALLDAY_ORIGIN
+RUN DISABLE_ESLINT_PLUGIN=true npm run build
+
+FROM node:22.14.0-alpine AS allday-build
+WORKDIR /build/allday
+COPY apps/server-allday/package.json apps/server-allday/package-lock.json ./
+RUN npm ci --no-audit --no-fund
+COPY apps/server-allday/ ./
+ENV EXPO_PUBLIC_SEBOARD_SSO_ENABLED=true EXPO_OFFLINE=1
+RUN npm test && npm run build:web
+
+FROM nginx:alpine
+COPY --from=board-build /build/board/build/ /usr/share/nginx/html/
+COPY --from=allday-build /build/allday/dist/ /usr/share/nginx/html/allday/
+COPY apps/se-board/nginx.integrated.conf.template /etc/nginx/templates/default.conf.template
+ENV ALLDAY_API_UPSTREAM=http://127.0.0.1:18082
+EXPOSE 80
