@@ -1,4 +1,3 @@
-import { Flex, Spinner, Text } from "@chakra-ui/react";
 import React, { useMemo } from "react";
 import { BrowserRouter, useLocation, useRoutes } from "react-router-dom";
 import { useRecoilValue } from "recoil";
@@ -196,14 +195,7 @@ const MenuRouter = () => {
         },
         {
           path: "*",
-          element: isLoading ? (
-            <Flex role="status" align="center" gap="2" p="6">
-              <Spinner size="sm" />
-              <Text>메뉴를 불러오는 중입니다.</Text>
-            </Flex>
-          ) : (
-            <PageNotFound />
-          ),
+          element: isLoading ? null : <PageNotFound />,
         },
       ],
     },
