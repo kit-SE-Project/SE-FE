@@ -57,11 +57,11 @@ npm.cmd run test:web
 
 `Dockerfile.web`이 두 웹을 각각 빌드한 뒤 Nginx 이미지에 결합합니다. `.github/workflows/cd.yml`은 저장소 루트 context와 이 Dockerfile을 사용합니다. 기존 CD의 main 배포 조건을 유지하므로 이 작업 브랜치를 로컬에서 수정하는 것만으로 운영 배포되지 않습니다.
 
-- 런타임 `ALLDAY_API_UPSTREAM`을 실제 백엔드 서비스 주소로 지정하세요. 컨테이너의 기본 `127.0.0.1`은 다른 백엔드 컨테이너를 가리키지 않습니다.
-- 웹과 대여 `/api/v1/`이 같은 공개 오리진이어야 합니다. Ingress에서 `/api/v1/`을 직접 다른 곳으로 보내면 이 이미지의 프록시·콜백 보정이 실행되지 않습니다.
-- `apps/se-board/nginx.integrated.conf.template`이 게시판·대여·SSO 중계를 구분합니다. `/allday/sso`를 대여 웹 fallback으로 보내지 마세요.
-- 현재 대여 백엔드의 `/api/v1/sso/callback`이 루트 `/`로 보내는 성공·expired/unavailable 응답은 `/allday/`로 보정합니다. 백엔드가 이미 `/allday/`로 보내면 그대로 통과합니다. 다른 API 리다이렉트는 바꾸지 않습니다.
-- 대여 API 경로는 `/api/v1/` 그대로입니다. Origin·Cookie·Set-Cookie를 보존하며 캐시하지 않습니다. 내부 매니저 경로는 이 웹 프록시로 공개하지 않습니다.
+- 웹과 대여 `/api/v1/`은 같은 공개 오리진(`https://seboard.site`)을 씁니다. 클러스터 Ingress가 `/api/v1/`·`/api/internal/`을 대여 백엔드(`seboard-allday`)로 직접 보내므로 이 이미지는 API를 프록시하지 않습니다.
+- 이 이미지에 `/api/`로 들어온 요청은 경로 설정 오류로 보고 404로 응답합니다. 게시판 화면으로 대체하지 않습니다.
+- `apps/se-board/nginx.integrated.conf.template`이 게시판·대여 웹·`/allday/sso`를 구분합니다. `/allday/sso`를 대여 웹 fallback으로 보내지 마세요.
+- 대여 백엔드는 `/api/v1/sso/callback` 처리 후 `/allday/`(실패 시 `/allday/?sso=expired|unavailable`)로 보냅니다.
+- 로컬 미리보기(`npm run preview:web`)만 `ALLDAY_API_UPSTREAM`으로 대여 API를 중계합니다.
 - 게시판 backend authorize·내부 exchange/identity·grant 무효화 계약을 유지합니다. 브라우저에서 게시판 토큰을 대여 웹에 복사하지 않습니다.
 - SSO 공개 오리진·콜백·portal 설정은 같은 게시판 HTTPS 도메인으로 맞춥니다. 공유 비밀·실제 토큰·비밀번호는 웹 빌드 변수나 저장소에 넣지 않습니다.
 
