@@ -3,8 +3,11 @@ server {
     server_name _;
     root /usr/share/nginx/html;
     index index.html;
+    # Ingress 뒤에서는 이 nginx가 HTTP로 요청을 받으므로, 전체 주소로 이동시키면 https 사용자가 http로 내려간다.
+    # 이동 주소를 경로만으로 보내 브라우저가 현재 https 주소를 그대로 쓰게 한다.
+    absolute_redirect off;
 
-    location = /allday { return 308 /allday/; }
+    location = /allday { return 308 /allday/$is_args$args; }
 
     # This page belongs to SEBoard, not to the rental web bundle.
     location = /allday/sso {
