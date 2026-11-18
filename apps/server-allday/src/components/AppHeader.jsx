@@ -5,6 +5,7 @@ import { Icon } from './ui';
 import { nicknameForMember } from '../api';
 
 const menu = ['공지사항', '자유게시판', '학사', '채용', 'SE 건의사항', '전공지식', '서버대여', 'Project & Job'];
+const boardPaths = { '공지사항': '/notice', '자유게시판': '/freeboard' };
 
 export default function AppHeader({ actor, api, onRent, onBoardHome, onSignOut }) {
   const { width } = useWindowDimensions();
@@ -27,7 +28,8 @@ export default function AppHeader({ actor, api, onRent, onBoardHome, onSignOut }
           <Text style={{ color: '#3296ff', fontSize: 18, fontWeight: '700' }}>{label}</Text>
           <View className="header-active-indicator" />
         </Pressable>
-      : <View key={label} className="header-menu-item" style={{ height: desktop ? 64 : 48 }}>
+      : <View key={label} href={onBoardHome ? boardPaths[label] : undefined}
+          className="header-menu-item" style={{ height: desktop ? 64 : 48, textDecorationLine: 'none' }}>
           <Text style={{ color: '#414b58', fontSize: 18, fontWeight: '600' }}>{label}</Text>
           {['학사', '채용'].includes(label) && <Icon name="external" color="#68727e" size={13} />}
         </View>)}

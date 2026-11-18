@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import { Flex, Spinner, Text } from "@chakra-ui/react";
+import React, { useMemo } from "react";
 import { BrowserRouter, useLocation, useRoutes } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 
@@ -55,11 +56,10 @@ interface RoutesObject {
 }
 
 const MenuRouter = () => {
-  const [dynamicRoutes, setDynamicRoutes] = useState<RoutesObject[]>([]);
   const menuList = useRecoilValue(menuListState);
   const { isLoading, isFetching, isError, refetch } = useFetchMenuList();
 
-  useEffect(() => {
+  const dynamicRoutes = useMemo(() => {
     const list: RoutesObject[] = [];
     menuList.forEach((menu) => {
       if (menu.type === "BOARD") {
@@ -116,7 +116,7 @@ const MenuRouter = () => {
           });
       }
     });
-    setDynamicRoutes(list);
+    return list;
   }, [menuList]);
 
   return useRoutes([
@@ -196,7 +196,14 @@ const MenuRouter = () => {
         },
         {
           path: "*",
-          element: <PageNotFound />,
+          element: isLoading ? (
+            <Flex role="status" align="center" gap="2" p="6">
+              <Spinner size="sm" />
+              <Text>메뉴를 불러오는 중입니다.</Text>
+            </Flex>
+          ) : (
+            <PageNotFound />
+          ),
         },
       ],
     },
