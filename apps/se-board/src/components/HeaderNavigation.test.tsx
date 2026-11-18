@@ -136,7 +136,7 @@ test("desktop menus remain visible when login controls make the navigation overf
     expect(window.getComputedStyle(navigation).visibility).not.toBe("hidden");
     expect(window.getComputedStyle(navigation).display).not.toBe("none");
     expect(navigation.querySelector('a[href="/notice"]')).toBeTruthy();
-    expect(navigation.querySelector('a[href="/allday/"]')).toBeTruthy();
+    expect(navigation.querySelector('a[href="/allday/"]')).toBeNull();
     expect(container.textContent).toContain("테스트 사용자");
   } finally {
     width.mockRestore();
@@ -144,15 +144,20 @@ test("desktop menus remain visible when login controls make the navigation overf
   }
 });
 
-test("empty loading menus show progress alongside the test rental link", () => {
+test("desktop test rental is available only after opening the right menu", () => {
   const { DesktopHeaderNavigation } = require("./HeaderNavigation");
-  const { container } = render(
+  const { container, act } = render(
     <DesktopHeaderNavigation menuList={[]} menuLoading />
   );
   expect(container.querySelector('[role="status"]')?.textContent).toContain(
     "메뉴를 불러오는 중"
   );
-  expect(container.querySelector('a[href="/allday/"]')?.textContent).toBe(
+  expect(document.querySelector('a[href="/allday/"]')).toBeNull();
+  const menuButton = container.querySelector<HTMLButtonElement>('button[aria-label="메뉴 열기"]')!;
+  expect(menuButton).toBeTruthy();
+  act(() => menuButton.click());
+  const dialog = document.querySelector('[role="dialog"]')!;
+  expect(dialog.querySelector('a[href="/allday/"]')?.textContent).toBe(
     "서버 대여 (테스트중)"
   );
 });
@@ -248,7 +253,8 @@ test("failed menu requests can be retried and replace the error with the loaded 
     expect(
       container.querySelector('a[href="https://legacy.example"]')
     ).toBeTruthy();
-    expect(container.querySelector('a[href="/allday/"]')).toBeTruthy();
+    expect(container.querySelector('a[href="/allday/"]')).toBeNull();
+    expect(container.querySelector('button[aria-label="메뉴 열기"]')).toBeTruthy();
   } finally {
     dispose?.();
     dispose = undefined;
