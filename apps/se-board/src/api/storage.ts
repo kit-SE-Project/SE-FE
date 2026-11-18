@@ -1,5 +1,6 @@
 const REFRESH_TOKEN_KEY = "refresh_token";
 const ACCESS_TOKEN_KEY = "access_token";
+export const AUTH_SESSION_CLEARED_EVENT = "seboard:session-cleared";
 
 export const isMaintainLogin = () => {
   return localStorage.getItem(REFRESH_TOKEN_KEY) ? true : false;
@@ -50,7 +51,14 @@ export const clearSotredRefreshToken = () => {
 };
 
 export const clearStoredAuthTokens = () => {
+  const hadSession = [localStorage, sessionStorage].some(
+    (store) =>
+      store.getItem(ACCESS_TOKEN_KEY) || store.getItem(REFRESH_TOKEN_KEY)
+  );
   clearSotredRefreshToken();
   sessionStorage.removeItem(ACCESS_TOKEN_KEY);
   localStorage.removeItem(ACCESS_TOKEN_KEY);
+  if (hadSession && typeof window !== "undefined" && window.dispatchEvent) {
+    window.dispatchEvent(new Event(AUTH_SESSION_CLEARED_EVENT));
+  }
 };

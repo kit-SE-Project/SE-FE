@@ -119,6 +119,7 @@ export const fetchRecruitList = (params: {
   return _axios<PageResponse<RecruitPostSummary>>({
     url: "/recruit",
     method: HTTP_METHODS.GET,
+    authMode: "public",
     headers: { ...getJWTHeader() },
     params: {
       type: params.type,

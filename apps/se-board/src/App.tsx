@@ -57,7 +57,7 @@ interface RoutesObject {
 const MenuRouter = () => {
   const [dynamicRoutes, setDynamicRoutes] = useState<RoutesObject[]>([]);
   const menuList = useRecoilValue(menuListState);
-  const { isLoading } = useFetchMenuList();
+  const { isLoading, isFetching, isError, refetch } = useFetchMenuList();
 
   useEffect(() => {
     const list: RoutesObject[] = [];
@@ -122,7 +122,16 @@ const MenuRouter = () => {
   return useRoutes([
     {
       path: "",
-      element: <MainLayout />,
+      element: (
+        <MainLayout
+          menuLoading={isLoading}
+          menuRefreshing={isFetching}
+          menuError={isError}
+          retryMenus={() => {
+            void refetch();
+          }}
+        />
+      ),
       children: [
         ...dynamicRoutes,
         { path: "", element: <MainPage /> },
