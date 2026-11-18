@@ -145,7 +145,6 @@ export const DesktopHeaderNavigation = ({
         w="full"
         align="center"
         justify="space-between"
-        gap="1rem"
         px="1rem"
       >
         <Logo size="3.5rem" />
@@ -153,7 +152,7 @@ export const DesktopHeaderNavigation = ({
           as="nav"
           display={viewMode === "desktop" ? "flex" : "none"}
           justifyContent="center"
-          flex="1"
+          w="auto"
           minW="0"
         >
           <Box
@@ -161,7 +160,7 @@ export const DesktopHeaderNavigation = ({
             minW="0"
             maxW="full"
             rowGap="1rem"
-            columnGap="1rem"
+            columnGap="2rem"
             whiteSpace="nowrap"
             overflowX="auto"
             px="1rem"
