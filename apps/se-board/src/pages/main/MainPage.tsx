@@ -1,4 +1,4 @@
-import { Flex, GridItem, SimpleGrid, Skeleton, Stack } from "@chakra-ui/react";
+import { Alert, AlertIcon, Button, Flex, GridItem, SimpleGrid, Skeleton, Stack, Text } from "@chakra-ui/react";
 import { useRecoilValue } from "recoil";
 
 import { convertPostListItemDTOToPostListItem } from "@/api/post";
@@ -11,7 +11,7 @@ import { Carousel } from "./Carousel";
 import { RecruitPreview } from "./RecruitPreview";
 
 export const MainPage = () => {
-  const { data, isLoading } = useMainPageMenu();
+  const { data, isLoading, isError, refetch } = useMainPageMenu();
   const { data: bannerResponse, isLoading: bannerLoading } = useFetchBanners();
   const menuList = useRecoilValue(menuListState);
 
@@ -26,6 +26,8 @@ export const MainPage = () => {
       px="1rem"
       py={{ base: "calc(56px + 1rem)", md: "1rem" }}
     >
+      {isLoading && <Text role="status">게시판을 불러오고 있습니다.</Text>}
+      {isError && <Alert status="error" borderRadius="md"><AlertIcon /><Stack><Text>게시판 데이터를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.</Text><Button onClick={() => refetch()}>다시 불러오기</Button></Stack></Alert>}
       {bannerLoading ? (
         <Skeleton
           w={{ base: "full", md: "container.md" }}

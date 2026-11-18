@@ -18,6 +18,7 @@ import {
   Flex,
   Icon,
   Link as ExternalLink,
+  Spinner,
   Text,
   useColorModeValue,
   useDisclosure,
@@ -30,6 +31,7 @@ import { BsBoxArrowUpRight, BsList } from "react-icons/bs";
 import { NavLink } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 
+import { allDayWebUrl } from "@/api/allday";
 import { GradientAvatar } from "@/components/common/GradientAvatar";
 import { NotificationBell } from "@/components/notification/NotificationBell";
 import { useNavigatePage, useWindowSize } from "@/hooks";
@@ -63,9 +65,61 @@ const DESKTOP_NAV_ITEMS: readonly NavItemProps[] = [
   },
 ] as const;
 
+export interface MenuLoadProps {
+  menuLoading?: boolean;
+  menuRefreshing?: boolean;
+  menuError?: boolean;
+  retryMenus?: () => void;
+}
+
+export const MenuLoadNotice = ({
+  menuLoading,
+  menuRefreshing,
+  menuError,
+  retryMenus,
+  empty,
+}: MenuLoadProps & { empty: boolean }) => {
+  if (menuLoading && empty) {
+    return (
+      <Flex role="status" align="center" gap="2" p="3">
+        <Spinner size="sm" />
+        <Text whiteSpace="nowrap">메뉴를 불러오는 중입니다.</Text>
+      </Flex>
+    );
+  }
+  if (!menuError && !empty) return null;
+  return (
+    <Flex
+      role={menuError ? "alert" : "status"}
+      align="center"
+      gap="2"
+      p="3"
+      flexWrap="wrap"
+    >
+      <Text fontSize="sm">
+        {menuError ? "메뉴를 불러오지 못했습니다." : "표시할 메뉴가 없습니다."}
+      </Text>
+      {retryMenus && (
+        <Button
+          size="sm"
+          variant="outline"
+          isLoading={menuRefreshing}
+          onClick={retryMenus}
+        >
+          다시 불러오기
+        </Button>
+      )}
+    </Flex>
+  );
+};
+
 export const DesktopHeaderNavigation = ({
   menuList = [],
-}: {
+  menuLoading,
+  menuRefreshing,
+  menuError,
+  retryMenus,
+}: MenuLoadProps & {
   menuList: Menu[];
 }) => {
   const [viewMode, setViewMode] = useState<"desktop" | "tablet">("desktop");
@@ -89,7 +143,7 @@ export const DesktopHeaderNavigation = ({
     } else {
       setViewMode("tablet");
     }
-  }, [windowSize, navRef]);
+  }, [windowSize, menuList, menuLoading, menuError]);
   return (
     <Center
       bgColor={headerBgColor}
@@ -123,9 +177,28 @@ export const DesktopHeaderNavigation = ({
             overflowX="auto"
             px="1rem"
           >
+            <MenuLoadNotice
+              empty={menuList.length === 0}
+              menuLoading={menuLoading}
+              menuRefreshing={menuRefreshing}
+              menuError={menuError}
+              retryMenus={retryMenus}
+            />
             {menuList.map((menu) => (
               <DesktopNavItem key={menu.name} {...menu} />
             ))}
+            {allDayWebUrl && (
+              <WrapItem
+                flexShrink={0}
+                m="0px"
+                fontSize="1.125rem"
+                fontWeight="bold"
+              >
+                <ExternalLink href={allDayWebUrl} color={color} py="1rem">
+                  서버 대여 (테스트중)
+                </ExternalLink>
+              </WrapItem>
+            )}
           </Box>
         </Box>
 
@@ -180,13 +253,22 @@ export const DesktopHeaderNavigation = ({
           {/* 태블릿/모바일: 햄버거 */}
           {viewMode === "tablet" && (
             <>
-              <Button onClick={onOpen} variant="ghost" p="0">
+              <Button
+                onClick={onOpen}
+                variant="ghost"
+                p="0"
+                aria-label="메뉴 열기"
+              >
                 <Icon as={BsList} color={color} boxSize="2rem" />
               </Button>
               <DrawerNavigation
                 isOpen={isOpen}
                 onClose={onClose}
                 menuList={menuList}
+                menuLoading={menuLoading}
+                menuRefreshing={menuRefreshing}
+                menuError={menuError}
+                retryMenus={retryMenus}
               />
             </>
           )}
@@ -196,14 +278,19 @@ export const DesktopHeaderNavigation = ({
   );
 };
 
-interface DrawerNavigationProps extends Omit<DrawerProps, "children"> {
+interface DrawerNavigationProps
+  extends Omit<DrawerProps, "children">, MenuLoadProps {
   menuList: Menu[];
 }
 
-const DrawerNavigation = ({
+export const DrawerNavigation = ({
   onClose,
   isOpen,
   menuList,
+  menuLoading,
+  menuRefreshing,
+  menuError,
+  retryMenus,
   ...props
 }: DrawerNavigationProps) => {
   const { goToLoginPage, goToMyPage } = useNavigatePage();
@@ -254,16 +341,35 @@ const DrawerNavigation = ({
               }}
             >
               <Text fontSize="md" color="gray.6">
-                로그인이 필요합니다
+                로그인
               </Text>
             </Flex>
           )}
         </DrawerHeader>
         <DrawerBody>
+          <MenuLoadNotice
+            empty={menuList.length === 0}
+            menuLoading={menuLoading}
+            menuRefreshing={menuRefreshing}
+            menuError={menuError}
+            retryMenus={retryMenus}
+          />
           <Wrap>
             {menuList.map((item, i) => (
               <DrawerNavItem key={i} {...item} onClick={onClose} />
             ))}
+            {allDayWebUrl && (
+              <WrapItem w="full" m="0px" fontSize="1.125rem" fontWeight="bold">
+                <ExternalLink
+                  href={allDayWebUrl}
+                  color={color}
+                  p="1rem"
+                  w="full"
+                >
+                  서버 대여 (테스트중)
+                </ExternalLink>
+              </WrapItem>
+            )}
           </Wrap>
         </DrawerBody>
         <DrawerFooter borderTopWidth="1px">
@@ -521,13 +627,14 @@ const DrawerNavItem = ({
             </AccordionButton>
             <AccordionPanel padding="0" pl="1rem">
               {subMenu.map((sub) => (
-                <DrawerNavItem {...sub} />
+                <DrawerNavItem key={sub.menuId} {...sub} onClick={onClick} />
               ))}
             </AccordionPanel>
           </AccordionItem>
         </Accordion>
       );
     case "BOARD":
+    case "RECRUIT":
       return (
         <WrapItem
           onClick={onClick}

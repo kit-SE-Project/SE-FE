@@ -32,8 +32,9 @@ export const useFetchMenuList = () => {
     queryKey: [queryKeys.menuList],
     queryFn: fetchMenuList,
     refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-    refetchOnMount: false,
+    refetchOnReconnect: true,
+    refetchOnMount: true,
+    retry: 1,
     staleTime: 1000 * 60 * 60,
     cacheTime: 1000 * 60 * 61,
     onSuccess: (res) => {

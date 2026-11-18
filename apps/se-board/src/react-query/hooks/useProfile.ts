@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { CommentListItemDTO, PostListItem } from "@types";
-import { useState } from "react";
-import { useSetRecoilState } from "recoil";
+import { useEffect, useState } from "react";
+import { useResetRecoilState, useSetRecoilState } from "recoil";
 
 import {
   convertPostListItemDTOToPostListItem,
@@ -19,17 +19,37 @@ import {
   updateUserProfile,
   uploadProfileImage,
 } from "@/api/profile";
-import { getStoredAccessToken } from "@/api/storage";
+import { isSessionAuthError } from "@/api/axiosInstance";
+import {
+  AUTH_SESSION_CLEARED_EVENT,
+  getStoredAccessToken,
+} from "@/api/storage";
 import { roleNames, userState } from "@/store/user";
 
 import { queryKeys } from "../queryKeys";
 
 export const useFetchUserSimpleInfo = () => {
   const setUserState = useSetRecoilState(userState);
+  const resetUserState = useResetRecoilState(userState);
+  const queryClient = useQueryClient();
 
-  return useQuery([queryKeys.profile], () => fetchUserSimpleInfo(), {
+  useEffect(() => {
+    const onSessionCleared = () => {
+      resetUserState();
+      queryClient.cancelQueries({ queryKey: [queryKeys.profile], exact: true });
+      queryClient.removeQueries({ queryKey: [queryKeys.profile], exact: true });
+      queryClient.invalidateQueries([queryKeys.menuList]);
+    };
+    window.addEventListener(AUTH_SESSION_CLEARED_EVENT, onSessionCleared);
+    return () =>
+      window.removeEventListener(AUTH_SESSION_CLEARED_EVENT, onSessionCleared);
+  }, [queryClient, resetUserState]);
+
+  return useQuery([queryKeys.profile], () => fetchUserSimpleInfo(true), {
     enabled: !!getStoredAccessToken(),
+    retry: (count, error) => !isSessionAuthError(error) && count < 1,
     onSuccess: (res) => {
+      if (!getStoredAccessToken()) return;
       const { nickname, userId, email, roles, profileImageUrl } = res.data;
       setUserState((prev) => ({
         ...prev,

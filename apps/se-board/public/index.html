@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
   <head>
     <meta charset="utf-8" />
     <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
@@ -25,10 +25,16 @@
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
     <title>SE Board</title>
+    <link rel="stylesheet" href="%PUBLIC_URL%/startup-v1.css" />
+    <script src="%PUBLIC_URL%/startup-v1.js"></script>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root"></div>
+    <div id="root"><main id="se-startup" role="status">
+      <h1>SE 게시판</h1>
+      <p id="se-startup-message">화면을 불러오고 있습니다.</p>
+      <a href="">다시 불러오기</a>
+    </main></div>
     <!--
       This HTML file is a template.
       If you open it directly in the browser, you will see an empty page.

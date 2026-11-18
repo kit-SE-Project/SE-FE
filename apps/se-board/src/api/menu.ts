@@ -19,6 +19,7 @@ export const fetchMenuList = () => {
     },
     url: "/menu",
     method: HTTP_METHODS.GET,
+    authMode: "public",
   });
 };
 

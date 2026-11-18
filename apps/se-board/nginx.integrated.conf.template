@@ -1,0 +1,55 @@
+server {
+    listen 80;
+    server_name _;
+    root /usr/share/nginx/html;
+    index index.html;
+    # Ingress 뒤에서는 이 nginx가 HTTP로 요청을 받으므로, 전체 주소로 이동시키면 https 사용자가 http로 내려간다.
+    # 이동 주소를 경로만으로 보내 브라우저가 현재 https 주소를 그대로 쓰게 한다.
+    absolute_redirect off;
+
+    location = /allday { return 308 /allday/$is_args$args; }
+
+    # This page belongs to SEBoard, not to the rental web bundle.
+    location = /allday/sso {
+        try_files /index.html =404;
+        add_header Cache-Control "no-store";
+        add_header Referrer-Policy "no-referrer";
+    }
+    location = /allday/sso/ { return 308 /allday/sso; }
+
+    # 클러스터 Ingress가 /api/v1/, /api/internal/을 대여 백엔드로 바로 보낸다.
+    # 이 웹 컨테이너까지 온 /api/ 요청은 경로 설정 오류이므로 게시판 화면 대신 404로 응답한다.
+    location ^~ /api/ { return 404; }
+
+    location = /allday/index.html {
+        try_files $uri =404;
+        add_header Cache-Control "no-cache, no-store, must-revalidate";
+    }
+    location ^~ /allday/_expo/ {
+        try_files $uri =404;
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+    location ^~ /allday/assets/ {
+        try_files $uri =404;
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+    location ^~ /allday/ {
+        try_files $uri $uri/ /allday/index.html;
+        add_header Cache-Control "no-cache";
+    }
+
+    location = /index.html {
+        add_header Cache-Control "no-cache, no-store, must-revalidate";
+    }
+    location / { try_files $uri $uri/ /index.html; }
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
+        try_files $uri =404;
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+    gzip on;
+    gzip_types text/plain text/css application/json application/javascript text/xml application/xml image/svg+xml;
+    gzip_min_length 1024;
+}

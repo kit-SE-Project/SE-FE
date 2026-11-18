@@ -1,0 +1,196 @@
+{
+  "documentDate": "2026-10-28",
+  "timeZone": "Asia/Seoul",
+  "source": "사용자가 전달한 DevTools Payload 및 최신 preview 응답을 JSON으로 전사·정리한 자료. 원본 HAR 또는 새로 실행한 HTTP 캡처가 아님.",
+  "requestId": null,
+  "httpStatus": null,
+  "deployedBackendVersion": null,
+  "expectedCondition": "제공된 5개 차단 구간 외에 추가 예약·별도 제한이 없고 동일 서버/조회 시점임을 전제로 한 기대 응답.",
+  "request": {
+    "serverId": 57,
+    "purpose": "ㅇㅇ",
+    "slots": [
+      {
+        "startAt": "2026-11-01T16:00:00+09:00",
+        "endAt": "2026-11-01T23:00:00+09:00"
+      },
+      {
+        "startAt": "2026-11-02T16:00:00+09:00",
+        "endAt": "2026-11-02T23:00:00+09:00"
+      },
+      {
+        "startAt": "2026-11-03T16:00:00+09:00",
+        "endAt": "2026-11-03T23:00:00+09:00"
+      },
+      {
+        "startAt": "2026-11-04T16:00:00+09:00",
+        "endAt": "2026-11-04T23:00:00+09:00"
+      },
+      {
+        "startAt": "2026-11-05T16:00:00+09:00",
+        "endAt": "2026-11-05T23:00:00+09:00"
+      }
+    ]
+  },
+  "actualPreview": {
+    "serverId": 57,
+    "minimumSwitchSeconds": 3600,
+    "serverAvailable": true,
+    "canReserve": false,
+    "horizonPolicy": "CALENDAR_TWO_MONTHS",
+    "slots": [
+      {
+        "startAt": "2026-10-28T00:28:03.152263Z",
+        "endAt": "2026-11-01T14:00:00Z"
+      },
+      {
+        "startAt": "2026-11-02T07:00:00Z",
+        "endAt": "2026-11-02T14:00:00Z"
+      },
+      {
+        "startAt": "2026-11-03T07:00:00Z",
+        "endAt": "2026-11-03T14:00:00Z"
+      },
+      {
+        "startAt": "2026-11-04T07:00:00Z",
+        "endAt": "2026-11-04T14:00:00Z"
+      },
+      {
+        "startAt": "2026-11-05T07:00:00Z",
+        "endAt": "2026-11-05T14:00:00Z"
+      }
+    ],
+    "conflicts": [
+      {
+        "code": "SLOT_CONFLICT",
+        "candidate": {
+          "startAt": "2026-10-28T00:28:03.152263Z",
+          "endAt": "2026-11-01T14:00:00Z"
+        },
+        "blockedStart": "2026-10-27T14:58:01.274170Z",
+        "blockedEnd": "2026-10-28T06:00:00Z"
+      },
+      {
+        "code": "SLOT_CONFLICT",
+        "candidate": {
+          "startAt": "2026-10-28T00:28:03.152263Z",
+          "endAt": "2026-11-01T14:00:00Z"
+        },
+        "blockedStart": "2026-10-28T23:00:00Z",
+        "blockedEnd": "2026-10-29T06:00:00Z"
+      },
+      {
+        "code": "SLOT_CONFLICT",
+        "candidate": {
+          "startAt": "2026-10-28T00:28:03.152263Z",
+          "endAt": "2026-11-01T14:00:00Z"
+        },
+        "blockedStart": "2026-10-29T23:00:00Z",
+        "blockedEnd": "2026-10-30T06:00:00Z"
+      },
+      {
+        "code": "SLOT_CONFLICT",
+        "candidate": {
+          "startAt": "2026-10-28T00:28:03.152263Z",
+          "endAt": "2026-11-01T14:00:00Z"
+        },
+        "blockedStart": "2026-10-30T23:00:00Z",
+        "blockedEnd": "2026-10-31T06:00:00Z"
+      },
+      {
+        "code": "SLOT_CONFLICT",
+        "candidate": {
+          "startAt": "2026-10-28T00:28:03.152263Z",
+          "endAt": "2026-11-01T14:00:00Z"
+        },
+        "blockedStart": "2026-10-31T23:00:00Z",
+        "blockedEnd": "2026-11-01T06:00:00Z"
+      }
+    ]
+  },
+  "expectedPreview": {
+    "serverId": 57,
+    "minimumSwitchSeconds": 3600,
+    "serverAvailable": true,
+    "canReserve": true,
+    "horizonPolicy": "CALENDAR_TWO_MONTHS",
+    "slots": [
+      {
+        "startAt": "2026-11-01T07:00:00Z",
+        "endAt": "2026-11-01T14:00:00Z"
+      },
+      {
+        "startAt": "2026-11-02T07:00:00Z",
+        "endAt": "2026-11-02T14:00:00Z"
+      },
+      {
+        "startAt": "2026-11-03T07:00:00Z",
+        "endAt": "2026-11-03T14:00:00Z"
+      },
+      {
+        "startAt": "2026-11-04T07:00:00Z",
+        "endAt": "2026-11-04T14:00:00Z"
+      },
+      {
+        "startAt": "2026-11-05T07:00:00Z",
+        "endAt": "2026-11-05T14:00:00Z"
+      }
+    ],
+    "conflicts": []
+  },
+  "slotComparison": [
+    {
+      "index": 0,
+      "expectedStartUtc": "2026-11-01T07:00:00Z",
+      "actualStartUtc": "2026-10-28T00:28:03.152263Z",
+      "startMatches": false,
+      "endMatches": true
+    },
+    {
+      "index": 1,
+      "expectedStartUtc": "2026-11-02T07:00:00Z",
+      "actualStartUtc": "2026-11-02T07:00:00Z",
+      "startMatches": true,
+      "endMatches": true
+    },
+    {
+      "index": 2,
+      "expectedStartUtc": "2026-11-03T07:00:00Z",
+      "actualStartUtc": "2026-11-03T07:00:00Z",
+      "startMatches": true,
+      "endMatches": true
+    },
+    {
+      "index": 3,
+      "expectedStartUtc": "2026-11-04T07:00:00Z",
+      "actualStartUtc": "2026-11-04T07:00:00Z",
+      "startMatches": true,
+      "endMatches": true
+    },
+    {
+      "index": 4,
+      "expectedStartUtc": "2026-11-05T07:00:00Z",
+      "actualStartUtc": "2026-11-05T07:00:00Z",
+      "startMatches": true,
+      "endMatches": true
+    }
+  ],
+  "verifiedOffline": {
+    "requestSlotCount": 5,
+    "responseSlotCount": 5,
+    "changedStartIndices": [
+      0
+    ],
+    "unchangedIndices": [
+      1,
+      2,
+      3,
+      4
+    ],
+    "allEndTimesMatch": true,
+    "originalRequestsPassSuppliedBlockedIntervals": true,
+    "expandedCandidateOverlapsAllFiveSuppliedIntervals": true,
+    "liveBackendExecuted": false
+  }
+}
+

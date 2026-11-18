@@ -9,9 +9,10 @@ import {
   useColorModeValue,
 } from "@chakra-ui/react";
 import { useEffect } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { useSetRecoilState } from "recoil";
 
+import { pendingAllDayLoginPath } from "@/api/allday";
 import { loginWithKakao } from "@/api/auth";
 import { fetchUserSimpleInfo } from "@/api/profile";
 import { setStoredAccessToken, setStoredRefreshToken } from "@/api/storage";
@@ -23,7 +24,13 @@ import { roleNames, userState } from "@/store/user";
 import { LoginForm } from "./LoginForm";
 
 export const LoginPage = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const finishAllDayLogin = () => {
+    const target = pendingAllDayLoginPath();
+    if (target) navigate(target, { replace: true });
+    else goToMainPage();
+  };
   const { goToMainPage } = useNavigatePage();
   const setUserInfo = useSetRecoilState(userState);
 
@@ -46,7 +53,7 @@ export const LoginPage = () => {
             roles: roles.map((v) => roleNames[v as keyof typeof roleNames]),
           }));
         });
-        goToMainPage();
+        finishAllDayLogin();
       });
     }
   }, []);
@@ -67,7 +74,7 @@ export const LoginPage = () => {
       >
         <Logo size="64px" />
         <Flex w="full" pt="3rem" pb="2rem">
-          <LoginForm />
+          <LoginForm onAuthenticated={searchParams.get("allday") === "1" ? finishAllDayLogin : undefined} />
         </Flex>
         <Flex fontSize="sm" gap="0.5rem" alignSelf="flex-end" mb="2rem">
           <Text>계정이 없으신가요?</Text>

@@ -7,11 +7,12 @@ import {
 import { HTTP_METHODS } from ".";
 import { _axios, getJWTHeader } from "./axiosInstance";
 
-export const fetchUserSimpleInfo = async () => {
+export const fetchUserSimpleInfo = async (restoreSession = false) => {
   return _axios<FetchUserSimpleInfoResponse>({
     url: "mypage",
     method: HTTP_METHODS.GET,
     headers: getJWTHeader(),
+    authMode: restoreSession ? "optional" : "required",
   });
 };
 
