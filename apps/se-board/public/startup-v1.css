@@ -1,4 +1,0 @@
-#se-startup { min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; margin: 0; padding: 24px; box-sizing: border-box; background: #f7f9fc; color: #142033; font-family: system-ui, 'Malgun Gothic', sans-serif; }
-#se-startup h1 { font-size: 24px; margin: 0; }
-#se-startup p { margin: 0; color: #526683; line-height: 1.6; text-align: center; }
-#se-startup a { border: 1px solid #dce6f5; border-radius: 8px; padding: 10px 16px; background: white; color: #2563eb; text-decoration: none; }
