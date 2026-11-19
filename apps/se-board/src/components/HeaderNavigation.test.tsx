@@ -3,10 +3,11 @@ import React from "react";
 import { Menu } from "@types";
 
 let mockHasAuth = false;
+let mockWindowWidth = 1280;
 jest.mock("@/api/allday", () => ({ allDayWebUrl: "/allday/" }));
 jest.mock("@/hooks", () => ({
   useNavigatePage: () => ({}),
-  useWindowSize: () => ({ width: 1280 }),
+  useWindowSize: () => ({ width: mockWindowWidth }),
 }));
 jest.mock("@/react-query/hooks/auth", () => ({
   useLogout: () => ({ mutate: jest.fn() }),
@@ -66,6 +67,7 @@ afterEach(() => {
   dispose?.();
   dispose = undefined;
   mockHasAuth = false;
+  mockWindowWidth = 1280;
 });
 afterAll(() => {
   dom.window.close();
@@ -117,6 +119,7 @@ const menus = [
 ] as unknown as Menu[];
 
 test("desktop menus remain visible when login controls make the navigation overflow", () => {
+  mockWindowWidth = 992;
   const { DesktopHeaderNavigation } = require("./HeaderNavigation");
   const width = jest.spyOn(HTMLElement.prototype, "clientWidth", "get").mockReturnValue(300);
   const scrollWidth = jest.spyOn(HTMLElement.prototype, "scrollWidth", "get").mockReturnValue(900);
@@ -137,6 +140,7 @@ test("desktop menus remain visible when login controls make the navigation overf
     expect(window.getComputedStyle(navigation).display).not.toBe("none");
     expect(navigation.querySelector('a[href="/notice"]')).toBeTruthy();
     expect(navigation.querySelector('a[href="/allday/"]')).toBeNull();
+    expect(container.querySelector('button[aria-label="메뉴 열기"]')).toBeNull();
     expect(container.textContent).toContain("테스트 사용자");
   } finally {
     width.mockRestore();
@@ -144,7 +148,8 @@ test("desktop menus remain visible when login controls make the navigation overf
   }
 });
 
-test("desktop test rental is available only after opening the right menu", () => {
+test("the menu button appears below the original 992px breakpoint and opens test rental", () => {
+  mockWindowWidth = 991;
   const { DesktopHeaderNavigation } = require("./HeaderNavigation");
   const { container, act } = render(
     <DesktopHeaderNavigation menuList={[]} menuLoading />
@@ -252,7 +257,7 @@ test("failed menu requests can be retried and replace the error with the loaded 
       container.querySelector('a[href="https://legacy.example"]')
     ).toBeTruthy();
     expect(container.querySelector('a[href="/allday/"]')).toBeNull();
-    expect(container.querySelector('button[aria-label="메뉴 열기"]')).toBeTruthy();
+    expect(container.querySelector('button[aria-label="메뉴 열기"]')).toBeNull();
   } finally {
     dispose?.();
     dispose = undefined;

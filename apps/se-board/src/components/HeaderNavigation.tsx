@@ -25,6 +25,7 @@ import {
   WrapItem,
 } from "@chakra-ui/react";
 import { Menu } from "@types";
+import { useEffect } from "react";
 import { BsBoxArrowUpRight, BsList } from "react-icons/bs";
 import { NavLink } from "react-router-dom";
 import { useRecoilValue } from "recoil";
@@ -116,6 +117,9 @@ export const DesktopHeaderNavigation = ({
   const windowSize = useWindowSize();
   const viewMode = windowSize.width >= 992 ? "desktop" : "tablet";
   const { isOpen, onOpen, onClose } = useDisclosure();
+  useEffect(() => {
+    if (viewMode === "desktop") onClose();
+  }, [viewMode, onClose]);
   const { goToLoginPage, goToMyPage } = useNavigatePage();
   const { mutate: logout } = useLogout();
   const { userInfo, hasAuth } = useUserState();
@@ -218,17 +222,19 @@ export const DesktopHeaderNavigation = ({
               </Button>
             ))}
 
-          {/* 모든 화면에서 테스트 대여 링크를 여는 메뉴 */}
-          <Button
-            onClick={onOpen}
-            variant="ghost"
-            p="0"
-            aria-label="메뉴 열기"
-          >
-            <Icon as={BsList} color={color} boxSize="2rem" />
-          </Button>
+          {/* 기존 태블릿·모바일 기준인 992px 미만에서만 표시 */}
+          {viewMode === "tablet" && (
+            <Button
+              onClick={onOpen}
+              variant="ghost"
+              p="0"
+              aria-label="메뉴 열기"
+            >
+              <Icon as={BsList} color={color} boxSize="2rem" />
+            </Button>
+          )}
           <DrawerNavigation
-            isOpen={isOpen}
+            isOpen={viewMode === "tablet" && isOpen}
             onClose={onClose}
             menuList={menuList}
             menuLoading={menuLoading}
