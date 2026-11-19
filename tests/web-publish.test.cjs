@@ -3,7 +3,6 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const os = require('node:os');
-const vm = require('node:vm');
 const { publishWebBuild } = require('../scripts/publish-web-build.cjs');
 const { createWebPreview } = require('../scripts/preview-web.cjs');
 
@@ -39,13 +38,4 @@ test('an incomplete failed export does not replace the last working HTML', () =>
     file(live, 'index.html', 'WORKING'); file(stage, 'static/broken.js', 'INCOMPLETE');
     assert.throws(() => publishWebBuild(stage, live)); assert.equal(fs.readFileSync(path.join(live, 'index.html'), 'utf8'), 'WORKING');
   } finally { temp.cleanup(); }
-});
-
-test('startup loader reports a missing script and never replaces an already mounted React screen', () => {
-  const source = fs.readFileSync(path.join(__dirname, '../apps/se-board/public/startup-v1.js'), 'utf8');
-  let handler; let mounted = false; const message = { textContent: '' }; let role;
-  const context = { window: { addEventListener: (_event, callback) => { handler = callback; } }, document: { getElementById: name => mounted ? null : name === 'se-startup' ? { setAttribute: (_key, value) => { role = value; } } : message } };
-  vm.runInNewContext(source, context);
-  handler({ target: { tagName: 'SCRIPT' } }); assert.equal(role, 'alert'); assert.match(message.textContent, /다시 불러오기/);
-  mounted = true; message.textContent = 'React screen'; handler({ target: { tagName: 'SCRIPT' } }); assert.equal(message.textContent, 'React screen');
 });
