@@ -2,16 +2,18 @@
 import React from "react";
 import { Menu } from "@types";
 
+let mockHasAuth = false;
+let mockWindowWidth = 1280;
 jest.mock("@/api/allday", () => ({ allDayWebUrl: "/allday/" }));
 jest.mock("@/hooks", () => ({
   useNavigatePage: () => ({}),
-  useWindowSize: () => ({ width: 1280 }),
+  useWindowSize: () => ({ width: mockWindowWidth }),
 }));
 jest.mock("@/react-query/hooks/auth", () => ({
   useLogout: () => ({ mutate: jest.fn() }),
 }));
 jest.mock("@/store/user", () => ({
-  useUserState: () => ({ hasAuth: false, userInfo: {} }),
+  useUserState: () => ({ hasAuth: mockHasAuth, userInfo: { nickname: "테스트 사용자" } }),
 }));
 jest.mock("@/components/notification/NotificationBell", () => ({
   NotificationBell: () => null,
@@ -64,6 +66,8 @@ beforeAll(() => {
 afterEach(() => {
   dispose?.();
   dispose = undefined;
+  mockHasAuth = false;
+  mockWindowWidth = 1280;
 });
 afterAll(() => {
   dom.window.close();
@@ -114,17 +118,69 @@ const menus = [
   },
 ] as unknown as Menu[];
 
-test("empty loading menus show progress alongside the test rental link", () => {
+test("desktop menus remain visible when login controls make the navigation overflow", () => {
+  mockWindowWidth = 992;
   const { DesktopHeaderNavigation } = require("./HeaderNavigation");
-  const { container } = render(
-    <DesktopHeaderNavigation menuList={[]} menuLoading />
+  const width = jest.spyOn(HTMLElement.prototype, "clientWidth", "get").mockReturnValue(300);
+  const scrollWidth = jest.spyOn(HTMLElement.prototype, "scrollWidth", "get").mockReturnValue(900);
+  function LoginTransition() {
+    const [loggedIn, setLoggedIn] = React.useState(false);
+    mockHasAuth = loggedIn;
+    return <>
+      <button onClick={() => setLoggedIn(true)}>시험 로그인</button>
+      <DesktopHeaderNavigation menuList={menus} />
+    </>;
+  }
+  try {
+    const { container, act } = render(<LoginTransition />);
+    const login = Array.from(container.querySelectorAll("button")).find(button => button.textContent === "시험 로그인")!;
+    act(() => login.click());
+    const navigation = container.querySelector("nav")!;
+    expect(window.getComputedStyle(navigation).visibility).not.toBe("hidden");
+    expect(window.getComputedStyle(navigation).display).not.toBe("none");
+    expect(navigation.querySelector('a[href="/notice"]')).toBeTruthy();
+    expect(navigation.querySelector('a[href="/allday/"]')).toBeNull();
+    expect(container.querySelector('button[aria-label="메뉴 열기"]')).toBeNull();
+    expect(container.textContent).toContain("테스트 사용자");
+  } finally {
+    width.mockRestore();
+    scrollWidth.mockRestore();
+  }
+});
+
+test("the narrow-screen rental submenu expands beneath the original rental link", () => {
+  mockWindowWidth = 991;
+  const { DesktopHeaderNavigation } = require("./HeaderNavigation");
+  const { container, act } = render(
+    <DesktopHeaderNavigation menuList={menus} />
   );
-  expect(container.querySelector('[role="status"]')?.textContent).toContain(
-    "메뉴를 불러오는 중"
+  expect(container.querySelector('[role="status"]')).toBeNull();
+  expect(document.querySelector('a[href="/allday/"]')).toBeNull();
+  const menuButton = container.querySelector<HTMLButtonElement>('button[aria-label="메뉴 열기"]')!;
+  expect(menuButton).toBeTruthy();
+  act(() => menuButton.click());
+  const dialog = document.querySelector('[role="dialog"]')!;
+  expect(dialog.querySelector('a[href="/allday/"]')).toBeNull();
+  const submenuButton = dialog.querySelector<HTMLButtonElement>('button[aria-label="서버대여 하위 메뉴"]')!;
+  act(() => submenuButton.click());
+  expect(dialog.querySelector('a[href="/allday/"]')?.textContent).toBe(
+    "서버대여(테스트)"
   );
-  expect(container.querySelector('a[href="/allday/"]')?.textContent).toBe(
-    "서버 대여 (테스트중)"
-  );
+});
+
+test("hovering the original rental link opens the test link below it without changing its destination", async () => {
+  const { DesktopHeaderNavigation } = require("./HeaderNavigation");
+  const { container, act } = render(<DesktopHeaderNavigation menuList={menus} />);
+  const original = container.querySelector<HTMLAnchorElement>('a[href="https://legacy.example"]')!;
+  expect(document.querySelector('a[href="/allday/"]')).toBeNull();
+  await act(async () => {
+    original.dispatchEvent(new window.MouseEvent("mouseover", { bubbles: true }));
+    await new Promise(resolve => setTimeout(resolve, 30));
+  });
+  expect(original.getAttribute("href")).toBe("https://legacy.example");
+  const testLink = document.querySelector<HTMLAnchorElement>('a[href="/allday/"]')!;
+  expect(testLink?.textContent).toBe("서버대여(테스트)");
+  expect(container.querySelector("nav")!.contains(testLink)).toBe(false);
 });
 
 test("menu failure exposes retry and preserves existing links", () => {
@@ -157,6 +213,9 @@ test("mobile menu shows recruitment, original rental, test rental and a neutral 
   expect(dialog.textContent).not.toContain("로그인이 필요합니다");
   expect(dialog.textContent).toContain("로그인");
   expect(dialog.querySelector('a[href="https://legacy.example"]')).toBeTruthy();
+  expect(dialog.querySelector('a[href="/allday/"]')).toBeNull();
+  const submenuButton = dialog.querySelector<HTMLButtonElement>('button[aria-label="서버대여 하위 메뉴"]')!;
+  act(() => submenuButton.click());
   expect(dialog.querySelector('a[href="/allday/"]')).toBeTruthy();
   const recruit =
     dialog.querySelector<HTMLAnchorElement>('a[href="/recruit"]')!;
@@ -218,7 +277,8 @@ test("failed menu requests can be retried and replace the error with the loaded 
     expect(
       container.querySelector('a[href="https://legacy.example"]')
     ).toBeTruthy();
-    expect(container.querySelector('a[href="/allday/"]')).toBeTruthy();
+    expect(container.querySelector('a[href="/allday/"]')).toBeNull();
+    expect(container.querySelector('button[aria-label="메뉴 열기"]')).toBeNull();
   } finally {
     dispose?.();
     dispose = undefined;

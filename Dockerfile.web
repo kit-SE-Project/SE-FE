@@ -30,5 +30,4 @@ FROM nginx:alpine
 COPY --from=board-build /build/board/build/ /usr/share/nginx/html/
 COPY --from=allday-build /build/allday/dist/ /usr/share/nginx/html/allday/
 COPY apps/se-board/nginx.integrated.conf.template /etc/nginx/templates/default.conf.template
-ENV ALLDAY_API_UPSTREAM=http://127.0.0.1:18082
 EXPOSE 80
