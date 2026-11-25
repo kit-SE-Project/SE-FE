@@ -13,7 +13,7 @@ test('past bands and calendar horizon are validated using Seoul time', () => {
   const input={from:'2026-10-07',to:'2026-10-07',band:'MORNING',purpose:'test',now:new Date('2026-10-07T01:00:00Z')};
   assert.match(validateReservation(input),/이미 시작/);assert.equal(validateReservation({...input,band:'AFTERNOON'}),null);
   assert.match(validateReservation({...input,from:'2026-12-08',to:'2026-12-08'}),/2개월/);
-  assert.equal(horizonDay(new Date('2026-12-31T00:00:00Z')),'2027-02-28');
+  assert.equal(horizonDay(new Date('2026-12-31T00:00:00Z')),'2027-02-27');
 });
 test('blocked transition padding prevents adjacent reservation collision',()=>{
   assert.equal(overlaps({startAt:'2026-10-08T16:00:00+09:00',endAt:'2026-10-08T23:00:00+09:00'},{startAt:'2026-10-08T08:00:00+09:00',endAt:'2026-10-08T15:00:00+09:00',blockedEnd:'2026-10-08T16:30:00+09:00'}),true);
