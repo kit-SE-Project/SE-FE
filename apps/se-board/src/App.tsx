@@ -30,6 +30,7 @@ import SkillManagePage from "./pages/admin/SkillManagePage";
 import { BoardPage } from "./pages/board/BoardPage";
 import { PasswordChangeWithoutLoginPage } from "./pages/login";
 import { AllDaySsoPage } from "./pages/login/AllDaySsoPage";
+import { AllDayLogoutPage } from "./pages/login/AllDayLogoutPage";
 import { MainPage } from "./pages/main/MainPage";
 import { PageNotFound } from "./pages/PageNotFound";
 import { BookmarkPage } from "./pages/profile/BookmarkPage";
@@ -292,6 +293,7 @@ const BoardRoutes = () => {
 const AppRoutes = () => {
   const path = useLocation().pathname.replace(/\/+$/, "").toLowerCase();
   if (path === "/allday/sso") return <AllDaySsoPage />;
+  if (path === "/allday/logout") return <AllDayLogoutPage />;
   if (path === "/login") return <LoginPage />;
   return <BoardRoutes />;
 };

@@ -14,12 +14,13 @@ test('the integrated site separates board, rental, portal and missing assets on 
   fs.mkdirSync(boardRoot); fs.mkdirSync(alldayRoot); fs.writeFileSync(path.join(boardRoot, 'index.html'), 'BOARD'); fs.writeFileSync(path.join(alldayRoot, 'index.html'), 'RENTAL');
   const server = createWebPreview({ boardRoot, alldayRoot }); const origin = await listen(server);
   try {
-    for (const [route, body] of [['/', 'BOARD'], ['/notice/42', 'BOARD'], ['/allday/', 'RENTAL'], ['/allday/mine', 'RENTAL'], ['/allday/sso', 'BOARD']]) {
+    for (const [route, body] of [['/', 'BOARD'], ['/notice/42', 'BOARD'], ['/allday/', 'RENTAL'], ['/allday/mine', 'RENTAL'], ['/allday/sso', 'BOARD'], ['/allday/logout', 'BOARD']]) {
       const response = await fetch(origin + route); assert.equal(response.status, 200); assert.equal(await response.text(), body);
     }
     for (const route of ['/allday/_expo/missing.js', '/allday/assets/missing.woff2', '/allday/_expo/unknown', '/api/internal/leases']) assert.equal((await fetch(origin + route)).status, 404);
     const redirect = await fetch(origin + '/allday?view=mine', { redirect: 'manual' }); assert.equal(redirect.headers.get('location'), '/allday/?view=mine');
     assert.equal((await fetch(origin + '/allday/sso/', { redirect: 'manual' })).headers.get('location'), '/allday/sso');
+    assert.equal((await fetch(origin + '/allday/logout/', { redirect: 'manual' })).headers.get('location'), '/allday/logout');
   } finally {
     await close(server);
     assert.equal(path.dirname(path.resolve(directory)), path.resolve(os.tmpdir()));

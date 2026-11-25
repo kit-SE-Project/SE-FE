@@ -17,7 +17,7 @@ function app(options = {}) {
     dispose: () => {},
     me: async () => { if (options.unavailable) throw Object.assign(new Error('인증 서비스 오류'), { status: 503 }); return options.currentActor || initialActor; },
     servers: async () => [], categories: async () => [], rentals: async () => [], adminCategories: async () => [],
-    logout: async () => { if (!options.logoutKeepsCookie) cookieActive = false; throw new Error('로그아웃 응답 손실'); },
+    logout: async () => { if (!options.logoutKeepsCookie) cookieActive = false; if (!options.logoutSucceeds) throw new Error('로그아웃 응답 손실'); },
   };
   const state = initial => {
     const i = cursor++; if (!cells[i]) cells[i] = { value: typeof initial === 'function' ? initial() : initial };
@@ -67,10 +67,18 @@ async function run(options, check, enabled = true) {
   finally { view.close(); if (previous === undefined) delete process.env.EXPO_PUBLIC_SEBOARD_SSO_ENABLED; else process.env.EXPO_PUBLIC_SEBOARD_SSO_ENABLED = previous; }
 }
 
-test('a failed logout response followed by signed-out confirmation clears the old user and shows login', () => run({}, async view => {
+test('a lost logout response confirmed signed out continues to SE logout instead of silently retaining the board session', () => run({}, async view => {
   await view.header().props.onSignOut(); await view.settle();
-  assert.equal(view.header(), undefined); assert.match(view.component('./src/screens/LoginScreen').props.initialNotice, /로그아웃했습니다/);
-  assert.deepEqual(view.redirects, []);
+  assert.equal(view.header(), undefined);
+  assert.deepEqual(view.redirects, ['/allday/logout']);
+  assert.ok(Number(window.sessionStorage.getItem('seboard.allday.logout-intent')) > 0);
+}));
+
+test('successful AllDay logout clears rental identity and continues to the existing SE logout before any new SSO', () => run({ logoutSucceeds: true }, async view => {
+  await view.header().props.onSignOut(); await view.settle();
+  assert.equal(view.header(), undefined);
+  assert.deepEqual(view.redirects, ['/allday/logout']);
+  assert.ok(Number(window.sessionStorage.getItem('seboard.allday.logout-intent')) > 0);
 }));
 test('a failed logout retaining a valid cookie restores the user and reports the failure', () => run({ logoutKeepsCookie: true }, async view => {
   await view.header().props.onSignOut(); await view.settle();
