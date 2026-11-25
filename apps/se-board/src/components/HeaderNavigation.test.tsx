@@ -148,11 +148,11 @@ test("desktop menus remain visible when login controls make the navigation overf
   }
 });
 
-test("the menu button appears below the original 992px breakpoint and opens test rental", () => {
+test("the narrow-screen rental submenu expands beneath the original rental link", () => {
   mockWindowWidth = 991;
   const { DesktopHeaderNavigation } = require("./HeaderNavigation");
   const { container, act } = render(
-    <DesktopHeaderNavigation menuList={[]} menuLoading />
+    <DesktopHeaderNavigation menuList={menus} />
   );
   expect(container.querySelector('[role="status"]')).toBeNull();
   expect(document.querySelector('a[href="/allday/"]')).toBeNull();
@@ -160,9 +160,27 @@ test("the menu button appears below the original 992px breakpoint and opens test
   expect(menuButton).toBeTruthy();
   act(() => menuButton.click());
   const dialog = document.querySelector('[role="dialog"]')!;
+  expect(dialog.querySelector('a[href="/allday/"]')).toBeNull();
+  const submenuButton = dialog.querySelector<HTMLButtonElement>('button[aria-label="서버대여 하위 메뉴"]')!;
+  act(() => submenuButton.click());
   expect(dialog.querySelector('a[href="/allday/"]')?.textContent).toBe(
-    "서버 대여 (테스트중)"
+    "서버대여(테스트)"
   );
+});
+
+test("hovering the original rental link opens the test link below it without changing its destination", async () => {
+  const { DesktopHeaderNavigation } = require("./HeaderNavigation");
+  const { container, act } = render(<DesktopHeaderNavigation menuList={menus} />);
+  const original = container.querySelector<HTMLAnchorElement>('a[href="https://legacy.example"]')!;
+  expect(document.querySelector('a[href="/allday/"]')).toBeNull();
+  await act(async () => {
+    original.dispatchEvent(new window.MouseEvent("mouseover", { bubbles: true }));
+    await new Promise(resolve => setTimeout(resolve, 30));
+  });
+  expect(original.getAttribute("href")).toBe("https://legacy.example");
+  const testLink = document.querySelector<HTMLAnchorElement>('a[href="/allday/"]')!;
+  expect(testLink?.textContent).toBe("서버대여(테스트)");
+  expect(container.querySelector("nav")!.contains(testLink)).toBe(false);
 });
 
 test("menu failure exposes retry and preserves existing links", () => {
@@ -195,6 +213,9 @@ test("mobile menu shows recruitment, original rental, test rental and a neutral 
   expect(dialog.textContent).not.toContain("로그인이 필요합니다");
   expect(dialog.textContent).toContain("로그인");
   expect(dialog.querySelector('a[href="https://legacy.example"]')).toBeTruthy();
+  expect(dialog.querySelector('a[href="/allday/"]')).toBeNull();
+  const submenuButton = dialog.querySelector<HTMLButtonElement>('button[aria-label="서버대여 하위 메뉴"]')!;
+  act(() => submenuButton.click());
   expect(dialog.querySelector('a[href="/allday/"]')).toBeTruthy();
   const recruit =
     dialog.querySelector<HTMLAnchorElement>('a[href="/recruit"]')!;

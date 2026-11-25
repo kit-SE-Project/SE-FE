@@ -1,15 +1,25 @@
 import React, { useEffect, useState } from 'react';
-import { Pressable, ScrollView, Text, View, useWindowDimensions } from 'react-native';
+import { Platform, Pressable, ScrollView, Text, View, useWindowDimensions } from 'react-native';
 import BrandLogo from './BrandLogo';
 import { Icon } from './ui';
 import { nicknameForMember } from '../api';
 
-const menu = ['공지사항', '자유게시판', '학사', '채용', 'SE 건의사항', '전공지식', '서버대여', 'Project & Job'];
-const boardPaths = { '공지사항': '/notice', '자유게시판': '/freeboard' };
+const menu = ['공지사항', '자유게시판', '학사', '채용', 'SE 건의사항', '서버대여', 'Project & Job'];
+const boardPaths = {
+  '공지사항': '/notice',
+  '자유게시판': '/freeboard',
+  '학사': 'https://www.kumoh.ac.kr/ko/sub06_01_01_01.do',
+  '채용': 'https://cs.kumoh.ac.kr/cs/sub0602.do',
+  'SE 건의사항': '/df883bcb',
+  '서버대여': '/server-reservation',
+  'Project & Job': '/recruit',
+};
 
 export default function AppHeader({ actor, api, onRent, onBoardHome, onSignOut }) {
   const { width } = useWindowDimensions();
   const desktop = width >= 1180;
+  const web = Platform.OS === 'web';
+  const MenuLink = web ? 'a' : View;
   const [profile, setProfile] = useState(null);
   useEffect(() => {
     let live = true;
@@ -21,18 +31,20 @@ export default function AppHeader({ actor, api, onRent, onBoardHome, onSignOut }
   const nickname = profile?.api === api && profile?.memberId === actor.memberId ? profile.nickname : '';
   const name = nickname || `회원 ID ${actor.memberId}`;
   const navigation = <View className={`flex-row items-stretch ${desktop ? 'w-full justify-between' : ''}`} style={{ gap: desktop ? 16 : 26 }}>
-    {menu.map(label => label === '서버대여'
+    {menu.map(label => label === '서버대여' && !web
       ? <Pressable key={label} testID="header-rental-tab" accessibilityRole="tab"
           accessibilityState={{ selected: true }} aria-selected accessibilityLabel="서버대여"
           onPress={onRent} className="header-menu-item" style={{ height: desktop ? 64 : 48 }}>
           <Text style={{ color: '#3296ff', fontSize: 18, fontWeight: '700' }}>{label}</Text>
           <View className="header-active-indicator" />
         </Pressable>
-      : <View key={label} href={onBoardHome ? boardPaths[label] : undefined}
-          className="header-menu-item" style={{ height: desktop ? 64 : 48, textDecorationLine: 'none' }}>
+      : <MenuLink key={label} href={web ? boardPaths[label] : undefined}
+          target={web && ['학사', '채용'].includes(label) ? '_blank' : undefined}
+          rel={web && ['학사', '채용'].includes(label) ? 'noopener noreferrer' : undefined}
+          className="header-menu-item" style={{ display: 'flex', height: desktop ? 64 : 48, textDecorationLine: 'none' }}>
           <Text style={{ color: '#414b58', fontSize: 18, fontWeight: '600' }}>{label}</Text>
           {['학사', '채용'].includes(label) && <Icon name="external" color="#68727e" size={13} />}
-        </View>)}
+        </MenuLink>)}
   </View>;
   return <View className="border-b border-line bg-white">
     <View className="mx-auto w-full flex-row items-center justify-between px-4" style={{ maxWidth: 1440, minHeight: 64, gap: desktop ? 24 : 16 }}>
