@@ -37,7 +37,7 @@ import { BsBoxArrowUpRight, BsList } from "react-icons/bs";
 import { NavLink } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 
-import { allDayWebUrl } from "@/api/allday";
+import { allDayStartUrl } from "@/api/allday";
 import { GradientAvatar } from "@/components/common/GradientAvatar";
 import { NotificationBell } from "@/components/notification/NotificationBell";
 import { useNavigatePage, useWindowSize } from "@/hooks";
@@ -178,7 +178,7 @@ export const DesktopHeaderNavigation = ({
               retryMenus={retryMenus}
             />
             {menuList.map((menu) => (
-              isRentalMenu(menu) && allDayWebUrl ? (
+              isRentalMenu(menu) && allDayStartUrl ? (
                 <RentalHoverMenu key={menu.menuId} menu={menu} />
               ) : (
                 <DesktopNavItem key={menu.menuId} {...menu} />
@@ -339,7 +339,7 @@ export const DrawerNavigation = ({
           />
           <Wrap>
             {menuList.map((item) => (
-              isRentalMenu(item) && allDayWebUrl ? (
+              isRentalMenu(item) && allDayStartUrl ? (
                 <RentalDrawerMenu key={item.menuId} menu={item} onClose={onClose} />
               ) : (
                 <DrawerNavItem key={item.menuId} {...item} onClick={onClose} />
@@ -444,7 +444,7 @@ const RentalHoverMenu = ({ menu }: { menu: Menu }) => {
         >
           <PopoverBody p="1">
             <ExternalLink
-              href={allDayWebUrl!} display="block" px="4" py="3" color={color}
+              href={allDayStartUrl!} display="block" px="4" py="3" color={color}
               fontWeight="bold" whiteSpace="nowrap" borderRadius="sm"
               _hover={{ bg: hoverBackground, textDecoration: "none" }}
             >
@@ -476,7 +476,7 @@ const RentalDrawerMenu = ({ menu, onClose }: { menu: Menu; onClose: () => void }
       </Flex>
       {isOpen && (
         <ExternalLink
-          href={allDayWebUrl!} onClick={onClose} display="block"
+          href={allDayStartUrl!} onClick={onClose} display="block"
           pl="8" pr="4" py="3" color={color} fontWeight="bold" borderRadius="lg"
           _hover={{ bg: hoverBackground, textDecoration: "none" }}
         >
