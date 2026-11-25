@@ -17,6 +17,13 @@ server {
     }
     location = /allday/sso/ { return 308 /allday/sso; }
 
+    location = /allday/logout {
+        try_files /index.html =404;
+        add_header Cache-Control "no-store";
+        add_header Referrer-Policy "no-referrer";
+    }
+    location = /allday/logout/ { return 308 /allday/logout; }
+
     # 클러스터 Ingress가 /api/v1/, /api/internal/을 대여 백엔드로 바로 보낸다.
     # 이 웹 컨테이너까지 온 /api/ 요청은 경로 설정 오류이므로 게시판 화면 대신 404로 응답한다.
     location ^~ /api/ { return 404; }

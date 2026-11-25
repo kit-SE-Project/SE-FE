@@ -98,3 +98,19 @@ test("refreshes the existing Board login before authorizing when access is missi
     headers: { Authorization: "Bearer refreshed-board-token" },
   }));
 });
+
+test("a recent rental logout intent is consumed once and rejects forged GETs, stale or future timestamps", () => {
+  const api = loadApi();
+  const key = "seboard.allday.logout-intent";
+  expect(api.consumeAllDayLogoutIntent()).toBe(false);
+  for (const value of ["", "not-a-time", String(Date.now() - 61_000), String(Date.now() + 30_000)]) {
+    sessionStorage.setItem(key, value);
+    expect(api.consumeAllDayLogoutIntent()).toBe(false);
+  }
+  sessionStorage.setItem(key, String(Date.now()));
+  expect(api.consumeAllDayLogoutIntent()).toBe(true);
+  expect(api.consumeAllDayLogoutIntent()).toBe(false);
+  api.allDayLoginFromBrowser();
+  api.cancelPendingAllDayLogin();
+  expect(api.pendingAllDayLoginPath()).toBeNull();
+});

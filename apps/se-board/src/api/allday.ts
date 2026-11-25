@@ -4,6 +4,20 @@ const pendingKey = "seboard.allday.sso";
 const identifier = /^[A-Za-z0-9_-]{43}$/;
 const portalPath = "/allday/sso";
 
+export function consumeAllDayLogoutIntent(): boolean {
+  try {
+    const value = sessionStorage.getItem("seboard.allday.logout-intent");
+    sessionStorage.removeItem("seboard.allday.logout-intent");
+    const requestedAt = value === null ? NaN : Number(value);
+    const age = Date.now() - requestedAt;
+    return Number.isSafeInteger(requestedAt) && age >= 0 && age <= 60_000;
+  } catch { return false; }
+}
+
+export function cancelPendingAllDayLogin() {
+  sessionStorage.removeItem(pendingKey);
+}
+
 type PendingLogin = { state: string; codeChallenge: string; expiresAt: number };
 
 function rentalOrigin() {

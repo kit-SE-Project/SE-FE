@@ -29,7 +29,9 @@ import {
 } from "@/api/auth";
 import { deleteFcmToken } from "@/api/fcm";
 import { fetchUserSimpleInfo } from "@/api/profile";
+import { getJWTHeader, isSessionAuthError, refreshStoredAccessToken } from "@/api/axiosInstance";
 import {
+  clearStoredAuthTokens,
   getStoredRefreshToken,
   isMaintainLogin,
   setStoredAccessToken,
@@ -154,26 +156,46 @@ export const useKakaoLogin = async (id: string) => {
   });
 };
 
-export const useLogout = () => {
+export const useLogout = (options?: { returnToAllDay: boolean }) => {
   const resetUserState = useResetRecoilState(userState);
   const queryClient = useQueryClient();
 
   const { goToLoginPage } = useNavigatePage();
-  const refreshToken = getStoredRefreshToken();
-  return useMutation(["logout"], () => logout(refreshToken!), {
+  return useMutation(["logout"], async () => {
+    let refreshToken = getStoredRefreshToken();
+    if (options?.returnToAllDay && !refreshToken) return null;
+    try {
+      if (options?.returnToAllDay && !getJWTHeader().Authorization) {
+        await refreshStoredAccessToken();
+        refreshToken = getStoredRefreshToken();
+      }
+      try { return await logout(refreshToken!, !!options?.returnToAllDay); }
+      catch (failure) {
+        const current = getStoredRefreshToken();
+        if (!options?.returnToAllDay || !current || current === refreshToken) throw failure;
+        // An automatic refresh may have rotated the token in the first request body.
+        return await logout(current, true);
+      }
+    } catch (failure) {
+      const result = failure as { status?: number; response?: { status?: number } };
+      if (options?.returnToAllDay && (isSessionAuthError(failure) ||
+          result?.status === 401 || result?.response?.status === 401)) return null;
+      throw failure;
+    }
+  }, {
     onSuccess: (res) => {
       // 로그인 유지였던 경우 FCM 토큰 삭제
       if (isMaintainLogin()) deleteFcmToken().catch(() => {});
 
-      localStorage.removeItem("access_token");
-      sessionStorage.removeItem("access_token");
-      localStorage.removeItem("refresh_token");
-      sessionStorage.removeItem("refresh_token");
-      if (res.data.requiredRedirect) {
-        window.location.href = res.data.url;
-      }
+      clearStoredAuthTokens();
       queryClient.invalidateQueries([queryKeys.menuList]);
       resetUserState();
+      if (options?.returnToAllDay) {
+        if (res?.data.requiredRedirect) window.location.href = res.data.url;
+        else window.location.replace("/allday/");
+        return;
+      }
+      if (res?.data.requiredRedirect) window.location.href = res.data.url;
       goToLoginPage();
     },
   });

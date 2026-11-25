@@ -90,7 +90,7 @@ export const fetchOAUthUserBasicInfo = async (id: string) => {
   });
 };
 
-export const logout = async (refreshToken: string) => {
+export const logout = async (refreshToken: string, preserveAuthRoute = false) => {
   return _axios<{ requiredRedirect: boolean; url: string }>({
     url: "logoutProc",
     method: HTTP_METHODS.POST,
@@ -98,6 +98,7 @@ export const logout = async (refreshToken: string) => {
       ...getJWTHeader(),
     },
     data: { refreshToken },
+    ...(preserveAuthRoute ? { preserveAuthRoute: true } : {}),
   });
 };
 

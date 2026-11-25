@@ -37,6 +37,11 @@ function beginSso() {
   markSsoSession(false);
   window.location.replace('/api/v1/sso/start');
 }
+function finishBoardSignOut() {
+  try { window.sessionStorage.setItem('seboard.allday.logout-intent', String(Date.now())); }
+  catch { /* The board will require an explicit logout click if storage is unavailable. */ }
+  window.location.replace('/allday/logout');
+}
 function takeSsoNotice() {
   const url = new URL(window.location.href);
   const status = url.searchParams.get('sso');
@@ -112,7 +117,9 @@ export default function App() {
         if(ssoReturnNotice.current) {
           setLoginNotice(ssoReturnNotice.current);
         } else if(logoutRecheckNotice.current) {
-          setLoginNotice('로그아웃했습니다.');
+          logoutRecheckNotice.current='';
+          finishBoardSignOut();
+          return;
         } else if (wasActive) {
           beginSso();
           return;
@@ -197,7 +204,7 @@ export default function App() {
     if(ssoEnabled) {
       if (signingOut.current) return;
       signingOut.current=true;
-      try { await client?.logout(); clearLocalSession(); }
+      try { await client?.logout(); clearLocalSession(); finishBoardSignOut(); }
       catch(e) {
         client?.dispose();
         logoutRecheckNotice.current=`로그아웃을 확인하지 못했습니다. 다시 시도하세요. ${message(e)}`;

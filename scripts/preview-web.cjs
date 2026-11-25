@@ -46,8 +46,8 @@ function createWebPreview({
     }
     if (!['GET', 'HEAD'].includes(request.method)) { response.writeHead(405, { Allow: 'GET, HEAD' }).end(); return; }
     if (name === '/allday') { response.writeHead(308, { Location: '/allday/' + route.search }).end(); return; }
-    if (name === '/allday/sso/') { response.writeHead(308, { Location: '/allday/sso' + route.search }).end(); return; }
-    const portal = name === '/allday/sso';
+    if (['/allday/sso/', '/allday/logout/'].includes(name)) { response.writeHead(308, { Location: name.slice(0, -1) + route.search }).end(); return; }
+    const portal = name === '/allday/sso' || name === '/allday/logout';
     const rental = !portal && name.startsWith('/allday/');
     const root = rental ? alldayRoot : boardRoot;
     let relative;
