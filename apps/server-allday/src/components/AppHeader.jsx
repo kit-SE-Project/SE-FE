@@ -4,13 +4,14 @@ import BrandLogo from './BrandLogo';
 import { Icon } from './ui';
 import { nicknameForMember } from '../api';
 
-const menu = ['공지사항', '자유게시판', '학사', '채용', 'SE 건의사항', '서버대여', 'Project & Job'];
+const menu = ['공지사항', '자유게시판', '학사', '채용', 'SE 건의사항', '전공지식', '서버대여', 'Project & Job'];
 const boardPaths = {
   '공지사항': '/notice',
   '자유게시판': '/freeboard',
   '학사': 'https://www.kumoh.ac.kr/ko/sub06_01_01_01.do',
   '채용': 'https://cs.kumoh.ac.kr/cs/sub0602.do',
   'SE 건의사항': '/df883bcb',
+  '전공지식': '/knowledge',
   '서버대여': '/server-reservation',
   'Project & Job': '/recruit',
 };

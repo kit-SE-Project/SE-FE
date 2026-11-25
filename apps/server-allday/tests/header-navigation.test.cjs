@@ -41,7 +41,7 @@ for (const width of [1440, 375]) {
       '공지사항': '/notice', '자유게시판': '/freeboard',
       '학사': 'https://www.kumoh.ac.kr/ko/sub06_01_01_01.do',
       '채용': 'https://cs.kumoh.ac.kr/cs/sub0602.do',
-      'SE 건의사항': '/df883bcb', '서버대여': '/server-reservation', 'Project & Job': '/recruit',
+      'SE 건의사항': '/df883bcb', '전공지식': '/knowledge', '서버대여': '/server-reservation', 'Project & Job': '/recruit',
     });
     for (const link of links) {
       assert.equal(link.type, 'a');
@@ -61,7 +61,7 @@ for (const width of [1440, 375]) {
 test('web navigation remains enabled without the SSO home callback', () => {
   const view = renderHeader(1440, false);
   const links = view.nodes.filter(node => node.type === 'a');
-  assert.equal(links.length, 7);
+  assert.equal(links.length, 8);
   assert.equal(links.find(node => view.text(node) === '서버대여').props.href, '/server-reservation');
 });
 
