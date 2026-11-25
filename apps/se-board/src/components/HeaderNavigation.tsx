@@ -17,7 +17,13 @@ import {
   DrawerProps,
   Flex,
   Icon,
+  IconButton,
   Link as ExternalLink,
+  Popover,
+  PopoverBody,
+  PopoverContent,
+  PopoverTrigger,
+  Portal,
   Text,
   useColorModeValue,
   useDisclosure,
@@ -25,6 +31,7 @@ import {
   WrapItem,
 } from "@chakra-ui/react";
 import { Menu } from "@types";
+import { ChevronDownIcon } from "@chakra-ui/icons";
 import { useEffect } from "react";
 import { BsBoxArrowUpRight, BsList } from "react-icons/bs";
 import { NavLink } from "react-router-dom";
@@ -63,6 +70,8 @@ const DESKTOP_NAV_ITEMS: readonly NavItemProps[] = [
     isExternalSite: true,
   },
 ] as const;
+
+const isRentalMenu = (menu: Menu) => menu.name.replace(/\s/g, "") === "서버대여";
 
 export interface MenuLoadProps {
   menuLoading?: boolean;
@@ -169,7 +178,11 @@ export const DesktopHeaderNavigation = ({
               retryMenus={retryMenus}
             />
             {menuList.map((menu) => (
-              <DesktopNavItem key={menu.name} {...menu} />
+              isRentalMenu(menu) && allDayWebUrl ? (
+                <RentalHoverMenu key={menu.menuId} menu={menu} />
+              ) : (
+                <DesktopNavItem key={menu.menuId} {...menu} />
+              )
             ))}
           </Box>
         </Box>
@@ -325,21 +338,13 @@ export const DrawerNavigation = ({
             retryMenus={retryMenus}
           />
           <Wrap>
-            {menuList.map((item, i) => (
-              <DrawerNavItem key={i} {...item} onClick={onClose} />
+            {menuList.map((item) => (
+              isRentalMenu(item) && allDayWebUrl ? (
+                <RentalDrawerMenu key={item.menuId} menu={item} onClose={onClose} />
+              ) : (
+                <DrawerNavItem key={item.menuId} {...item} onClick={onClose} />
+              )
             ))}
-            {allDayWebUrl && (
-              <WrapItem w="full" m="0px" fontSize="1.125rem" fontWeight="bold">
-                <ExternalLink
-                  href={allDayWebUrl}
-                  color={color}
-                  p="1rem"
-                  w="full"
-                >
-                  서버 대여 (테스트중)
-                </ExternalLink>
-              </WrapItem>
-            )}
           </Wrap>
         </DrawerBody>
         <DrawerFooter borderTopWidth="1px">
@@ -419,6 +424,68 @@ interface NavItemProps {
   isExternalSite?: boolean;
   onClick?: () => void;
 }
+
+const RentalHoverMenu = ({ menu }: { menu: Menu }) => {
+  const background = useColorModeValue("white", "gray.800");
+  const hoverBackground = useColorModeValue("gray.50", "whiteAlpha.100");
+  const color = useColorModeValue("gray.7", "whiteAlpha.800");
+
+  return (
+    <Popover trigger="hover" placement="bottom-start" openDelay={0} closeDelay={150} isLazy>
+      <PopoverTrigger>
+        <Box flexShrink={0}>
+          <DesktopNavItem {...menu} />
+        </Box>
+      </PopoverTrigger>
+      <Portal>
+        <PopoverContent
+          w="auto" minW="12rem" bg={background} boxShadow="lg"
+          borderRadius="md" aria-label="서버대여 하위 메뉴"
+        >
+          <PopoverBody p="1">
+            <ExternalLink
+              href={allDayWebUrl!} display="block" px="4" py="3" color={color}
+              fontWeight="bold" whiteSpace="nowrap" borderRadius="sm"
+              _hover={{ bg: hoverBackground, textDecoration: "none" }}
+            >
+              서버대여(테스트)
+            </ExternalLink>
+          </PopoverBody>
+        </PopoverContent>
+      </Portal>
+    </Popover>
+  );
+};
+
+const RentalDrawerMenu = ({ menu, onClose }: { menu: Menu; onClose: () => void }) => {
+  const { isOpen, onToggle } = useDisclosure();
+  const color = useColorModeValue("gray.7", "whiteAlpha.800");
+  const hoverBackground = useColorModeValue("gray.0", "whiteAlpha.200");
+
+  return (
+    <Box w="full">
+      <Flex align="center">
+        <Box flex="1" minW="0">
+          <DrawerNavItem {...menu} onClick={onClose} />
+        </Box>
+        <IconButton
+          aria-label="서버대여 하위 메뉴" aria-expanded={isOpen}
+          onClick={onToggle} variant="ghost"
+          icon={<ChevronDownIcon transform={isOpen ? "rotate(180deg)" : undefined} />}
+        />
+      </Flex>
+      {isOpen && (
+        <ExternalLink
+          href={allDayWebUrl!} onClick={onClose} display="block"
+          pl="8" pr="4" py="3" color={color} fontWeight="bold" borderRadius="lg"
+          _hover={{ bg: hoverBackground, textDecoration: "none" }}
+        >
+          서버대여(테스트)
+        </ExternalLink>
+      )}
+    </Box>
+  );
+};
 
 const DesktopNavItem = ({ type, name, externalUrl, urlId, subMenu }: Menu) => {
   const color = useColorModeValue("gray.7", "whiteAlpha.800");
