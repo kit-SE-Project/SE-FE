@@ -10,9 +10,14 @@ function horizonInstant(now = new Date()) {
   const local = new Date(now.getTime() + 9 * 3600000);
   const month = local.getUTCMonth() + 2;
   const last = new Date(Date.UTC(local.getUTCFullYear(), month + 1, 0)).getUTCDate();
-  return new Date(Date.UTC(local.getUTCFullYear(), month, Math.min(local.getUTCDate(), last), local.getUTCHours(), local.getUTCMinutes(), local.getUTCSeconds(), local.getUTCMilliseconds()) - 9 * 3600000);
+  return new Date(Date.UTC(local.getUTCFullYear(), month, Math.min(local.getUTCDate(), last)) - 9 * 3600000);
 }
-function horizonDay(now = new Date()) { return seoulDay(horizonInstant(now)); }
+// horizonAt is an end boundary: a full-day rental may end at midnight,
+// while the last selectable day is the day immediately before that boundary.
+function horizonDay(now = new Date(), reservationHorizonAt = null) {
+  const boundary = reservationHorizonAt ? new Date(reservationHorizonAt) : horizonInstant(now);
+  return seoulDay(new Date(boundary.getTime() - 1));
+}
 function makeSlots(from, to, band, { startTime, endTime } = {}) {
   if (!from || !to || to < from) throw new Error('대여 시작일과 종료일을 선택하세요.');
   if (band === 'CUSTOM') {
@@ -67,7 +72,7 @@ function calendarDayState(day, band, blockedSlots = [], now = new Date(), minimu
     morning: reserved('MORNING'), afternoon: reserved('AFTERNOON'),
     // Use the actual booked window for markers, rather than padded switch time.
     longTerm: liveSlots.some(slot => isLongTermSlot(slot) && overlaps(fullDay, { startAt: slot.startAt, endAt: slot.endAt })),
-    disabled: band === 'CUSTOM' ? day < seoulDay(now) || day > seoulDay(reservationHorizonAt ? new Date(reservationHorizonAt) : horizonInstant(now)) : day < seoulDay(now) || new Date(candidate.startAt) <= now || new Date(candidate.endAt) > (reservationHorizonAt ? new Date(reservationHorizonAt) : horizonInstant(now)) || liveSlots.some(slot => reservationConflict(candidate, slot, minimumSwitchSeconds)),
+    disabled: band === 'CUSTOM' ? day < seoulDay(now) || day > horizonDay(now, reservationHorizonAt) : day < seoulDay(now) || new Date(candidate.startAt) <= now || new Date(candidate.endAt) > (reservationHorizonAt ? new Date(reservationHorizonAt) : horizonInstant(now)) || liveSlots.some(slot => reservationConflict(candidate, slot, minimumSwitchSeconds)),
   };
 }
 function bandLabel(band) { return band === 'CUSTOM' ? '시간 직접 지정' : band === 'LONG_TERM' ? '장기 대여 (24시간)' : band === 'AFTERNOON' ? '오후 (16:00 - 23:00)' : '오전 (08:00 - 15:00)'; }
@@ -87,10 +92,10 @@ function validateReservation({ from, to, band, startTime, endTime, purpose, bloc
   if (purpose.length > 2000) return '사용 용도는 2,000자 이내로 입력하세요.';
   if (!from || !to || to < from) return '대여 시작일과 종료일을 선택하세요.';
   const endLimit = reservationHorizonAt ? new Date(reservationHorizonAt) : horizonInstant(now);
-  if (from < seoulDay(now) || to > seoulDay(endLimit)) return '현재부터 2개월 이내의 날짜를 선택하세요.';
+  if (from < seoulDay(now) || to > horizonDay(now, reservationHorizonAt)) return '오늘을 포함한 달력 2개월 이내의 날짜를 선택하세요.';
   let slots;
   try { slots = makeSlots(from, to, band, { startTime, endTime }); } catch (error) { return error.message; }
-  if (slots.some(s => new Date(s.endAt) > endLimit)) return '대여 종료 시각은 현재 시각부터 2개월 이내여야 합니다.';
+  if (slots.some(s => new Date(s.endAt) > endLimit)) return '대여 종료 시각은 오늘부터 달력 2개월 한도 이내여야 합니다.';
   if (slots.some(s => new Date(s.startAt) <= now)) return '이미 시작된 시간대는 선택할 수 없습니다.';
   const conflicts = slots.flatMap(s => blockedSlots.map(b => reservationConflict(s, b, minimumSwitchSeconds))).filter(Boolean);
   if (conflicts.includes('overlap')) return '선택한 기간에 이미 예약된 시간대가 있습니다.';

@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, Pressable, TextInput, ActivityIndicator, Platform, useWindowDimensions } from 'react-native';
 import { Button, Dialog, Icon, Notice, Panel, inputClass } from './ui';
 import { requestKey } from '../api';
-const { seoulDay, monthCells, makeSlots, reservationClock, reservationNow, validateReservation, calendarDayState } = require('../domain.cjs');
+const { seoulDay, horizonDay, monthCells, makeSlots, reservationClock, reservationNow, validateReservation, calendarDayState } = require('../domain.cjs');
 
 function DateTimeInput({ label, type, value, onChange, min, max, disabled }) {
   return <View className="min-w-0 flex-1">
@@ -16,7 +16,7 @@ export default function ReservationDialog({ server, api, onClose, onSubmit }) {
   const { width } = useWindowDimensions();
   const serverBlocked = server.status !== 'AVAILABLE' || !server.reservationAllowed;
   const [clock,setClock] = useState(()=>reservationClock());
-  const today = seoulDay(reservationNow(clock)); const horizon = seoulDay(new Date(clock.horizonAt));
+  const today = seoulDay(reservationNow(clock)); const horizon = horizonDay(reservationNow(clock), clock.horizonAt);
   const [month, setMonth] = useState(new Date(`${today.slice(0, 7)}-01T12:00:00`));
   const [from, setFrom] = useState(''); const [to, setTo] = useState('');
   const [band, setBand] = useState('MORNING'); const [purpose, setPurpose] = useState('');
@@ -73,6 +73,7 @@ export default function ReservationDialog({ server, api, onClose, onSubmit }) {
     <Text className="mb-6 text-xs text-muted">{server.cpu} · {server.ram} · {server.gpu}</Text>
     {serverBlocked&&<View className="mb-4"><Notice>점검 중이거나 현재 예약할 수 없는 서버입니다.</Notice></View>}
     <Text className="mb-3 text-sm font-medium text-ink">대여 기간 (2개월 캘린더)</Text>
+    <Text className="mb-3 text-xs text-muted">대여 가능 기간: {today} ~ {horizon} (한국 시간)</Text>
     <Panel className="p-3">
       <View className="mb-2 flex-row justify-between"><Button variant="ghost" disabled={previousDisabled} onPress={() => setMonth(new Date(month.getFullYear(), month.getMonth()-1,1))}>← 이전 달</Button><Button variant="ghost" disabled={nextDisabled} onPress={() => setMonth(nextMonth)}>다음 달 →</Button></View>
       <View className={`gap-5 ${width >= 650 ? 'flex-row' : ''}`}>
